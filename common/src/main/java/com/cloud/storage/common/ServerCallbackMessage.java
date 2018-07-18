@@ -1,6 +1,13 @@
 package com.cloud.storage.common;
 
 public class ServerCallbackMessage extends AbstractMessage {
+
+    // Ответ на:
+    // * Авторизацию
+    // * Регистрацию
+    // * Приём файла
+    // * Удаление, добавление директории
+
     public enum Answer {
         OK,
         FAIL

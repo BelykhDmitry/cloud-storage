@@ -2,10 +2,13 @@ package simple.client;
 
 import com.cloud.storage.common.AuthMessage;
 import com.cloud.storage.common.CmdMessage;
+import com.cloud.storage.common.FileMessage;
 import com.cloud.storage.common.ServerCallbackMessage;
 import io.netty.handler.codec.serialization.ObjectDecoderInputStream;
 import io.netty.handler.codec.serialization.ObjectEncoderOutputStream;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Socket;
 
@@ -19,11 +22,15 @@ public class Main {
             System.out.println("Connected");
             oeos = new ObjectEncoderOutputStream(socket.getOutputStream());
             odis = new ObjectDecoderInputStream(socket.getInputStream());
-            AuthMessage authMessage = new AuthMessage("Dmitrii");
+            AuthMessage authMessage = new AuthMessage("Dmitrii", "12345");
             oeos.writeObject(authMessage);
             oeos.flush();
             ServerCallbackMessage answer = (ServerCallbackMessage) odis.readObject();
             System.out.println(answer.getStatus().name());
+            FileMessage file = new FileMessage("./Example.txt");
+            /*byte[] data = new byte[];
+            new BufferedInputStream(new FileInputStream("Example.txt")).read(data);*/
+
             oeos.writeObject(new CmdMessage("Ping"));
             oeos.flush();
             System.out.println(((ServerCallbackMessage) odis.readObject()).getStatus());
