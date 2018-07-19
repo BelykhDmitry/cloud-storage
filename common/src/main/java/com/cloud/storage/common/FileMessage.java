@@ -1,10 +1,13 @@
 package com.cloud.storage.common;
 
+import java.util.List;
+
 public class FileMessage extends AbstractMessage {
 
     // Передача файла от/к Серверу
     // Оставить как контейнер?
 
+    private boolean isDirectory; // TODO
     private String fileRelativePathName;
     private byte[] data;
 

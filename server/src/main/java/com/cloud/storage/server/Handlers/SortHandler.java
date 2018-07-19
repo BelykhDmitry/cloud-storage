@@ -9,6 +9,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
 
+import java.util.ArrayList;
+
 public class SortHandler extends ChannelInboundHandlerAdapter {
 
     private String userName;
@@ -24,7 +26,7 @@ public class SortHandler extends ChannelInboundHandlerAdapter {
             System.out.println(msg.getClass()); //TODO: Logging
             System.out.flush();
             if (msg instanceof CmdMessage) {
-                CmdManager.getInstance().processCmd(userName, (CmdMessage) msg);
+                CmdManager.getInstance().processCmd(userName, (CmdMessage) msg, ctx);
                 System.out.println(((CmdMessage) msg).getCmd());
                 System.out.flush();
                 ctx.write(new ServerCallbackMessage(ServerCallbackMessage.Answer.FAIL));
