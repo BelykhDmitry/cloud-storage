@@ -11,15 +11,22 @@ public class SortHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         System.out.println("SortHandler In Read");
+        System.out.flush();
         try {
             if (msg == null)
                 return;
             System.out.println(msg.getClass()); //TODO: Logging
+            System.out.flush();
             if (msg instanceof CmdMessage) {
                 System.out.println(((CmdMessage) msg).getCmd());
+                System.out.flush();
                 ctx.write(new ServerCallbackMessage(ServerCallbackMessage.Answer.FAIL));
                 ctx.flush();
             } else if (msg instanceof FileMessage) {
+                System.out.println(((FileMessage)msg).getFileRelativePathName() + ": " + ((FileMessage)msg).getData().length);
+                System.out.flush();
+                ctx.write(new ServerCallbackMessage(ServerCallbackMessage.Answer.OK));
+                ctx.flush();
                 //FileMessage m = (FileMessage) msg;
             } else {
                 System.out.println("Неопознанный тип сообщения");

@@ -8,7 +8,7 @@ public class FileMessage extends AbstractMessage {
     private String fileRelativePathName;
     private byte[] data;
 
-    public FileMessage(String fileRelativePathName) {
+    public FileMessage(String fileRelativePathName, byte[] data) {
         this.fileRelativePathName = fileRelativePathName;
         this.data = data;
     }
