@@ -5,10 +5,12 @@ public class AuthMessage extends AbstractMessage {
     // TODO: Продумать механизм защиты
     private String name;
     private String pass;
+    private boolean isRegistration;
 
-    public AuthMessage(String name, String pass) {
+    public AuthMessage(String name, String pass, boolean isRegistration) {
         this.name = name;
         this.pass = pass;
+        this.isRegistration = isRegistration;
     }
 
     public String getName() {
@@ -17,5 +19,9 @@ public class AuthMessage extends AbstractMessage {
 
     public String getPass() {
         return pass;
+    }
+
+    public boolean isRegistration() {
+        return isRegistration;
     }
 }

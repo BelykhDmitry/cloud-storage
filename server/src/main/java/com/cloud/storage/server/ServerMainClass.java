@@ -1,6 +1,5 @@
 package com.cloud.storage.server;
 
-import com.cloud.storage.common.AuthMessage;
 import com.cloud.storage.server.Functions.Authorization;
 import com.cloud.storage.server.Handlers.AuthHandler;
 import io.netty.bootstrap.ServerBootstrap;
@@ -34,7 +33,7 @@ public class ServerMainClass {
                             protected void initChannel(SocketChannel socketChannel) throws Exception {
                                 socketChannel.pipeline().addLast(
                                         new ObjectDecoder(MAX_OBJ_SIZE, ClassResolvers.cacheDisabled(null)),
-                                        new ObjectEncoder(), // Это точно так?
+                                        new ObjectEncoder(),
                                         new AuthHandler()
                                 );
                             }
