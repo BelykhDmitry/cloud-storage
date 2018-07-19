@@ -57,7 +57,6 @@ public class ServerMainClass {
     }
 
     public static void main(String[] args) throws Exception {
-        new ServerMainClass().run();
-
+        new ServerMainClass().run();  // TODO: Сервисный режим. Перенос хранилища, работа с базой данных (установка пароля и тп).
     }
 }

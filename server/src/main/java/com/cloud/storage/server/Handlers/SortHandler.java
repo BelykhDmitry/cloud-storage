@@ -3,6 +3,7 @@ package com.cloud.storage.server.Handlers;
 import com.cloud.storage.common.CmdMessage;
 import com.cloud.storage.common.FileMessage;
 import com.cloud.storage.common.ServerCallbackMessage;
+import com.cloud.storage.server.Functions.CmdManager;
 import com.cloud.storage.server.Functions.FileManager;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -23,6 +24,7 @@ public class SortHandler extends ChannelInboundHandlerAdapter {
             System.out.println(msg.getClass()); //TODO: Logging
             System.out.flush();
             if (msg instanceof CmdMessage) {
+                CmdManager.getInstance().processCmd(userName, (CmdMessage) msg);
                 System.out.println(((CmdMessage) msg).getCmd());
                 System.out.flush();
                 ctx.write(new ServerCallbackMessage(ServerCallbackMessage.Answer.FAIL));

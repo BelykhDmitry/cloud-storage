@@ -57,7 +57,7 @@ public class Authorization {
 
     public void connect() throws ClassNotFoundException, SQLException {
         Class.forName("org.sqlite.JDBC");
-        connection = DriverManager.getConnection("jdbc:sqlite:auth_db.db");
+        connection = DriverManager.getConnection("jdbc:sqlite:auth_db.db"); //TODO: Реализация интерфейса для легкого перехода от одного типа БД к другому. Требуется база данных с паролем
         connection.setAutoCommit(false);
         statement = connection.createStatement();
     }

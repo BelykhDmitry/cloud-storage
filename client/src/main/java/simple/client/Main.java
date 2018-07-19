@@ -15,8 +15,8 @@ import java.nio.file.Paths;
 public class Main {
 
     private static void run() {
-        for (int i = 0; i < 5; i++) {
-            int j = i;
+        //for (int i = 0; i < 5; i++) {
+            int j = 0;
             new Thread(() -> {
                 try {
                     Thread.sleep(1000);
@@ -37,13 +37,24 @@ public class Main {
                     ServerCallbackMessage answer = (ServerCallbackMessage) odis.readObject();
                     System.out.println(answer.getStatus().name());
                     System.out.flush();
-                    String fileName = "Задача1.png";
+                    oeos.writeObject(new CmdMessage("", CmdMessage.CmdType.REMOVE_FOLDER));
+                    oeos.flush();
+                    System.out.println(answer.getStatus().name());
+                    System.out.flush();
+                    /*String fileName = "Задача1.png";
                     FileMessage file = new FileMessage(fileName, Files.readAllBytes(Paths.get(fileName)));
                     oeos.writeObject(file);
                     oeos.flush();
                     answer = (ServerCallbackMessage) odis.readObject();
                     System.out.println(answer.getStatus().name());
                     System.out.flush();
+                    fileName = "C:\\Users\\Dmitrii\\Desktop\\Счёт оплата контактов.pdf";
+                    file = new FileMessage("Счёт оплата контактов.pdf", Files.readAllBytes(Paths.get(fileName)));
+                    oeos.writeObject(file);
+                    oeos.flush();
+                    answer = (ServerCallbackMessage) odis.readObject();
+                    System.out.println(answer.getStatus().name());
+                    System.out.flush();*/
             /*oeos.writeObject(new CmdMessage("Ping"));
             oeos.flush();
             System.out.println(((ServerCallbackMessage) odis.readObject()).getStatus());
@@ -63,7 +74,7 @@ public class Main {
                     }
                 }
             }).run();
-        }
+        //}
         /*ObjectEncoderOutputStream oeos = null;
         ObjectDecoderInputStream odis = null;
         try {
