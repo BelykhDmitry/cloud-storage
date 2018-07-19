@@ -16,7 +16,7 @@ public class Main {
 
     private static void run() {
         //for (int i = 0; i < 5; i++) {
-            int j = 0;
+            int j = 10;
             new Thread(() -> {
                 try {
                     Thread.sleep(1000);
@@ -37,7 +37,7 @@ public class Main {
                     ServerCallbackMessage answer = (ServerCallbackMessage) odis.readObject();
                     System.out.println(answer.getStatus().name());
                     System.out.flush();
-                    oeos.writeObject(new CmdMessage("", CmdMessage.CmdType.REMOVE_FOLDER));
+                    oeos.writeObject(new CmdMessage("Задача1.png", CmdMessage.CmdType.REMOVE_FILE));
                     oeos.flush();
                     System.out.println(answer.getStatus().name());
                     System.out.flush();

@@ -35,6 +35,9 @@ public class CmdManager {
                 case CREATE_FOLDER:
                     FileManager.getInstance().makeDir(user, cmd.getCmd());
                     break;
+                case REMOVE_FILE:
+                    FileManager.getInstance().removeFile(user, cmd.getCmd());
+                    break;
                 default:throw new IOException("Неопознанная команда");
             }
         } catch (IOException e) {

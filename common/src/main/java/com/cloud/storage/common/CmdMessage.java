@@ -9,6 +9,7 @@ public class CmdMessage extends AbstractMessage {
         CREATE_FOLDER,
         REMOVE_FOLDER,
         GET_FILE,
+        REMOVE_FILE,
         GET_FOLDER //Продумать реализацию. Через List файлов?
     }
 

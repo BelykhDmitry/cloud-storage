@@ -25,7 +25,7 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
                 AuthMessage auth = (AuthMessage) msg;
                 if (auth.isRegistration()) {
                     if(Authorization.getInstance().register(auth)) {
-                        System.out.println(FileManager.getInstance().makeDir(auth.getName()));
+                        System.out.println(FileManager.getInstance().makeDir(auth.getName(),""));
                         authOk(ctx, auth.getName());
                     } else {
                         failAnswer(ctx);
@@ -70,7 +70,7 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
         ctx.pipeline().addLast(new SortHandler());
         ctx.fireChannelRead(name);
         ctx.flush();
-        //ctx.pipeline().addLast(new SortHandler());
+        ctx.pipeline().addLast(new SortHandler());
         ctx.pipeline().remove(this);
     }
 }
