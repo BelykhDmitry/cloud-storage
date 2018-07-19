@@ -9,7 +9,7 @@ public class CmdMessage extends AbstractMessage {
         CREATE_FOLDER,
         REMOVE_FOLDER,
         GET_FILE,
-        GET_FOLDER
+        GET_FOLDER //Продумать реализацию. Через List файлов?
     }
 
     private CmdType cmdType;
@@ -30,5 +30,4 @@ public class CmdMessage extends AbstractMessage {
     }
 
     // TODO: Add Folders (TreeItem)
-    // Functions: 1. File Download? Maybe -> FileMassage
 }

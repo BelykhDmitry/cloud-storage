@@ -32,6 +32,10 @@ public class CmdManager {
                 case GET_FILE:
                     FileManager.getInstance().readFile(user, cmd.getCmd()); // TODO: Куда прокинуть файл месседж?
                     break;
+                case CREATE_FOLDER:
+                    FileManager.getInstance().makeDir(user, cmd.getCmd());
+                    break;
+                default:throw new IOException("Неопознанная команда");
             }
         } catch (IOException e) {
             e.printStackTrace();

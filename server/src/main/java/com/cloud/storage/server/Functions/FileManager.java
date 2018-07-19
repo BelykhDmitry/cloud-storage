@@ -40,10 +40,10 @@ public class FileManager {
         return new FileMessage(fileRelativePath, Files.readAllBytes(Paths.get(rootFolder + user+ "\\" + fileRelativePath)));
     }
 
-    public boolean makeDir(String path) {
+    public boolean makeDir(String user, String path) {
         boolean result = false;
         try {
-            Files.createDirectories(Paths.get(rootFolder + path));
+            Files.createDirectories(Paths.get(rootFolder + user + "\\" + path));
             result = true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -52,6 +52,8 @@ public class FileManager {
     }
 
     public void removeDir(String user, String dirPath) throws IOException { //TODO: Проверять на пустую строку и на наличие ../
+        if (dirPath.equals("") || dirPath.contains(".."))
+            throw new IOException("Попытка удалить корневой каталог пользователя " + user);
         Path path = Paths.get(rootFolder + user + "\\" + dirPath);
         Files.walkFileTree(path, new FileVisitor<Path>() {
             @Override
