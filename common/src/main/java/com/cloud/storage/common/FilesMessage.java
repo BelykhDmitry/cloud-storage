@@ -11,7 +11,7 @@ public class FilesMessage extends AbstractMessage {
 
     public List<FileMessage> getList() {
         return list;
-    }
+    } // return Stream?
 
     public void addToList(FileMessage msg) {
         list.add(msg);

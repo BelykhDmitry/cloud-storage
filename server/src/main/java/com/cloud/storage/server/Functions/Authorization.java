@@ -38,7 +38,6 @@ public class Authorization {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        //System.out.println(msg.getName());
         return result;
     }
 

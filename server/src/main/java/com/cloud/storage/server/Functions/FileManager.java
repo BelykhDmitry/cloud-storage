@@ -23,13 +23,13 @@ public class FileManager {
         return localInstance;
     }
 
-    private final String rootFolder = "C:\\Users\\Dmitrii\\Cloud\\";  //TODO: Server Settings from File? (Root folder)
+    private final String rootFolder = "D:\\Dmitrii\\Cloud\\";  //TODO: Server Settings from File? (Root folder)
 
     //public void setPath(String path) {this.rootFolder = path;}
 
     public void writeFile(String user, FileMessage msg) { // TODO: Продумать, как лучше создавать поддиректории. Склоняюсь к отдельному запросу - не должно сильно загрузить сеть
         try {
-            String path = rootFolder + user+ "\\" + msg.getFileRelativePathName();
+            String path = rootFolder + user+ "\\" + msg.getFileRelativePathName(); // FIXME: Проверка поддиректорий
             //Files.createDirectories(Paths.get(path).getRoot());
             Files.write(Paths.get(path), msg.getData());
         } catch (IOException e) {

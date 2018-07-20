@@ -5,9 +5,8 @@ import java.util.List;
 public class FileMessage extends AbstractMessage {
 
     // Передача файла от/к Серверу
-    // Оставить как контейнер?
 
-    private boolean isDirectory; // TODO
+    private boolean isDirectory; // TODO: Продумать преобразование к универсальному сообщению для передачи файлов/каталогов
     private String fileRelativePathName;
     private byte[] data;
 

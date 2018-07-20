@@ -7,6 +7,7 @@ public class ServerCallbackMessage extends AbstractMessage {
     // * Регистрацию
     // * Приём файла
     // * Удаление, добавление директории
+    // TODO: продумать возможные Return Code
 
     public enum Answer {
         OK,
