@@ -33,7 +33,7 @@ public class Authorization {
         try {
             ResultSet resultSet = statement.executeQuery("SELECT Pas FROM Users WHERE Name LIKE '"+ msg.getName() +"';");
             if (resultSet.next()) {
-                result = msg.getPass().equals(resultSet.getString(1));
+                result = msg.getPass() == Integer.parseInt(resultSet.getString(1));
             }
         } catch (SQLException e) {
             e.printStackTrace();

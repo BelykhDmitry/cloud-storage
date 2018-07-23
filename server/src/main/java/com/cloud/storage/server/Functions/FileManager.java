@@ -1,10 +1,13 @@
 package com.cloud.storage.server.Functions;
 
 import com.cloud.storage.common.FileMessage;
+import com.cloud.storage.common.FilesMessage;
+import javafx.scene.control.TreeItem;
 
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 
 public class FileManager {
 
@@ -23,7 +26,7 @@ public class FileManager {
         return localInstance;
     }
 
-    private final String rootFolder = "D:\\Dmitrii\\Cloud\\";  //TODO: Server Settings from File? (Root folder)
+    private final String rootFolder = "C:\\Users\\Dmitrii\\Cloud\\";  //TODO: Server Settings from File? (Root folder)
 
     //public void setPath(String path) {this.rootFolder = path;}
 
@@ -37,7 +40,8 @@ public class FileManager {
         }
     }
     public FileMessage readFile(String user, String fileRelativePath) throws IOException {
-        return new FileMessage(fileRelativePath, Files.readAllBytes(Paths.get(rootFolder + user+ "\\" + fileRelativePath)));
+        Path p = Paths.get(rootFolder + user+ "\\" + fileRelativePath);
+        return new FileMessage(fileRelativePath, false, Files.readAllBytes(p), Files.size(p));
     }
 
     public boolean makeDir(String user, String path) {
@@ -81,6 +85,39 @@ public class FileManager {
     }
 
     public void removeFile(String user, String filePath) throws IOException {
+        if (filePath.equals("") || filePath.contains(".."))
+            throw new IOException("Попытка удалить корневой каталог пользователя " + user);
         Files.delete(Paths.get(rootFolder + user + "\\" + filePath));
+    }
+
+    public FilesMessage getFiles(String user, String filePath) throws IOException {
+        Path p = Paths.get(rootFolder + user + "\\" + filePath);
+        FilesMessage msg = new FilesMessage();
+        Files.walkFileTree(p, new FileVisitor<Path>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                if(dir.compareTo(p) != 0) {
+                    msg.addToList(p.relativize(dir).toString(), attrs.isDirectory(), null, attrs.size());
+                }
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                msg.addToList(p.relativize(file).toString(), attrs.isDirectory(), null, attrs.size());
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                return FileVisitResult.TERMINATE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                return FileVisitResult.CONTINUE;
+            }
+        });
+        return msg;
     }
 }

@@ -8,11 +8,14 @@ public class FileMessage extends AbstractMessage {
 
     private boolean isDirectory; // TODO: Продумать преобразование к универсальному сообщению для передачи файлов/каталогов
     private String fileRelativePathName;
+    private long size;
     private byte[] data;
 
-    public FileMessage(String fileRelativePathName, byte[] data) {
+    public FileMessage(String fileRelativePathName, boolean isDirectory, byte[] data, long size) {
         this.fileRelativePathName = fileRelativePathName;
+        this.isDirectory = isDirectory;
         this.data = data;
+        this.size = size;
     }
 
     public String getFileRelativePathName() {
@@ -25,5 +28,13 @@ public class FileMessage extends AbstractMessage {
 
     public byte[] getData() {
         return data;
+    }
+
+    public boolean isDirectory() {
+        return isDirectory;
+    }
+
+    public long getSize() {
+        return size;
     }
 }

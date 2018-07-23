@@ -4,12 +4,12 @@ public class AuthMessage extends AbstractMessage {
     // Сообщение с информацией об авторизации.
     // TODO: Продумать механизм защиты
     private String name;
-    private String pass;
+    private int pass;
     private boolean isRegistration;
 
     public AuthMessage(String name, String pass, boolean isRegistration) {
         this.name = name;
-        this.pass = pass;
+        this.pass = pass.hashCode();
         this.isRegistration = isRegistration;
     }
 
@@ -17,7 +17,7 @@ public class AuthMessage extends AbstractMessage {
         return name;
     }
 
-    public String getPass() {
+    public int getPass() {
         return pass;
     }
 
