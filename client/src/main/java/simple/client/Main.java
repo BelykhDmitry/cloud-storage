@@ -132,8 +132,8 @@ public class Main {
 //                    oeos.flush();
 //                    System.out.println(answer.getStatus().name());
 //                    System.out.flush();
-                String fileName = "Задача1.png";
-                FileMessage file = new FileMessage(fileName, false, Files.readAllBytes(Paths.get(fileName)), Paths.get(fileName).toFile().length());
+                String fileName = "C:\\Users\\Dmitrii\\Desktop\\Martin_-_Chisty_kod_2010.pdf";
+                FileMessage file = new FileMessage("Martin_-_Chisty_kod_2010.pdf", false, Files.readAllBytes(Paths.get(fileName)), Paths.get(fileName).toFile().length());
                 oeos.writeObject(file);
                 oeos.flush();
                 answer = (ServerCallbackMessage) odis.readObject();
