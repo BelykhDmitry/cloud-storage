@@ -8,39 +8,44 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.Socket;
 import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public  class  Network {
     private Socket sock;
-    Queue<Serializable> outQueue;
-    Queue<Serializable> inQueue;
-    Thread input;
-    Thread output;
+    private Queue<Serializable> outQueue;
+    private Queue<Serializable> inQueue;
+    private ObjectEncoderOutputStream oeos;
+    private ObjectDecoderInputStream odis;
+    private Thread input;
+    private Thread output;
 
     public Network() {
-        outQueue = new LinkedBlockingQueue<>();
-        inQueue = new LinkedBlockingQueue<>();
+        outQueue = new ConcurrentLinkedQueue<>();
+        inQueue = new ConcurrentLinkedQueue<>();
     }
 
     public void connect(String host, int port) throws IOException {
         sock = new Socket(host, port);
+        oeos = new ObjectEncoderOutputStream(sock.getOutputStream());
+        odis = new ObjectDecoderInputStream(sock.getInputStream());
         output = new Thread(() -> {
-            ObjectEncoderOutputStream oeos = null;
             try {
-                oeos = new ObjectEncoderOutputStream(sock.getOutputStream());
-                while(true) {
-                    if(!Thread.currentThread().isInterrupted()) {
-                        if(!outQueue.isEmpty()) {
-                            oeos.writeObject(outQueue.poll());
-                            oeos.flush();
-                        }
-                    } else {
-                        throw new InterruptedException();
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            //ObjectEncoderOutputStream oeos = null;
+            try {
+                //oeos = new ObjectEncoderOutputStream(sock.getOutputStream());
+                while(!Thread.currentThread().isInterrupted()) {
+                    if (outQueue.size() > 0) {
+                        oeos.writeObject(outQueue.poll());
+                        oeos.flush();
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
                 e.printStackTrace();
             } finally {
                 try {
@@ -53,19 +58,20 @@ public  class  Network {
             }
         });
         input = new Thread(() -> {
-            ObjectDecoderInputStream odis = null;
+            //ObjectDecoderInputStream odis = null;
             try {
-                odis = new ObjectDecoderInputStream(sock.getInputStream());
-                while(true) {
-                    if(!Thread.currentThread().isInterrupted()) {
-                        inQueue.add((AbstractMessage)odis.readObject());
-                    } else {
-                        throw new InterruptedException();
-                    }
-                }
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }catch (ClassNotFoundException e) {
+            }
+            try {
+                //odis = new ObjectDecoderInputStream(sock.getInputStream());
+                while(!Thread.currentThread().isInterrupted()) {
+                    if(odis.available() > 0) {
+                        inQueue.add((AbstractMessage) odis.readObject());
+                    }
+                }
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -79,10 +85,10 @@ public  class  Network {
                 }
             }
         });
-        output.setDaemon(false);
-        input.setDaemon(false);
-        output.run();
-        input.run();
+        output.setDaemon(true);
+        input.setDaemon(true);
+        output.start();
+        input.start();
     }
 
     public void disconnect() throws IOException {
