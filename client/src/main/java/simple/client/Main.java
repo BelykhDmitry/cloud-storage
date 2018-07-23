@@ -19,7 +19,7 @@ public class Main {
         Network net = new Network();
         try {
             net.connect("localhost", 8189);
-            net.addToQueue(new AuthMessage("User111", "12345", true));
+            net.addToQueue(new AuthMessage("User111", "12345", false));
             AbstractMessage msg;
             while((msg = net.getAnswer()) == null) {}
             if(msg instanceof ServerCallbackMessage) {

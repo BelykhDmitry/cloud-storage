@@ -45,7 +45,10 @@ public  class  Network {
                         oeos.flush();
                     }
                 }
+                throw new InterruptedException();
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             } finally {
                 try {
@@ -71,9 +74,12 @@ public  class  Network {
                         inQueue.add((AbstractMessage) odis.readObject());
                     }
                 }
+                throw new InterruptedException();
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             } finally {
                 try {
@@ -96,6 +102,7 @@ public  class  Network {
         output.interrupt();
         try {
             input.join(10000);
+            output.join(10000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
