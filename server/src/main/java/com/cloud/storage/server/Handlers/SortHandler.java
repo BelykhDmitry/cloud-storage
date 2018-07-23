@@ -37,17 +37,16 @@ public class SortHandler extends ChannelInboundHandlerAdapter {
                 FileManager.getInstance().writeFile(userName, (FileMessage)msg);
                 ctx.write(new ServerCallbackMessage(ServerCallbackMessage.Answer.OK));
                 ctx.flush();
-            } else if (msg instanceof String) {
-                if (!blocked) {
-                    userName = (String) msg; //TODO: Чем заменить? Небезопасно
-                    blocked = true;
-                }
             } else {
                 System.out.println("Неопознанный тип сообщения");
             }
         } finally {
             ReferenceCountUtil.release(msg);
         }
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     @Override

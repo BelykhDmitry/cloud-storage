@@ -67,10 +67,10 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
 
     private void authOk(ChannelHandlerContext ctx, String name) {
         okAnswer(ctx);
-        ctx.pipeline().addLast(new SortHandler());
-        ctx.fireChannelRead(name);
+        SortHandler ch = new SortHandler();
+        ctx.pipeline().addLast(ch);
+        ch.setUserName(name);
         ctx.flush();
-        ctx.pipeline().addLast(new SortHandler());
         ctx.pipeline().remove(this);
     }
 }
