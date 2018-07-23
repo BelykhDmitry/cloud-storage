@@ -1,0 +1,41 @@
+111Фреймворк Netty
+Netty представляет собой NIO клиент-серверный фреймворк, позволяющий разрабатывать гибкие,
+высокопроизводительные и масштабируемые сетевые приложения.
+Написание DISCARD сервера
+DISCARD является самым простым сетевым протоколом, который принимает сообщения без ответа
+на них. Для реализации этого протокола достаточно игнорировать все получаемые данные.
+Написание сервера начинается с реализации обработчика событий из библиотеки Netty.
+package io.netty.example.discard;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+public class DiscardServerHandler extends ChannelInboundHandlerAdapter { // (1)
+ @Override
+ public void channelRead(ChannelHandlerContext ctx, Object msg) { // (2)
+ // Discard the received data silently.
+ ((ByteBuf) msg).release(); // (3)
+ }
+ @Override
+ public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) { // (4)
+ // Close the connection when an exception is raised.
+ cause.printStackTrace();
+ ctx.close();
+ }
+}
+1. DiscardServerHandler наследуется от ChannelInboundHandlerAdapter, который реализует
+ChannelInboundHandler. ChannelInboundHandler предоставляет методы, обрабатывающие
+события получения и отправки сообщений;
+2. Необходимо переопределить метод channelRead(), который вызывается при получении
+данных от клиента. В данном случае входящее сообщение попадает в объект класса ByteBuf;
+3. Для реализации DISCARD протокола, обработчик должен игнорировать все входящие
+сообщения. ByteBuf представляет собой буфер данных, который должен быть очищен
+вызовом метода release(). Необходимо учесть, что освобождение ресурсов является именно
+задачей обработчика. Метод channelRead(), как правило, реализуется следующим образом:
+@Override
+public void channelRead(ChannelHandlerContext ctx, Object msg) {
+ try {
+ // Обрабатываем входящее сообщение msg
+ } finally {
+ ReferenceCountUtil.release(msg);
+ }
+}
