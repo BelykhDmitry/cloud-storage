@@ -1,5 +1,6 @@
 package simple.client;
 
+import com.cloud.storage.client.Network;
 import com.cloud.storage.common.*;
 import io.netty.handler.codec.serialization.ObjectDecoderInputStream;
 import io.netty.handler.codec.serialization.ObjectEncoderOutputStream;
@@ -15,59 +16,19 @@ public class Main {
     private static String rootFolder = "C:\\Users\\Dmitrii\\Cloud\\";
 
     private static void run() {
-//        try {
-//            getFiles("User10", "");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-        //for (int i = 0; i < 5; i++) {
-        client();
-        //System.out.println(Paths.get("C:\\Users\\Dmitrii\\Cloud\\User0\\Example.txt").getParent().toString());
-        //}
-        /*ObjectEncoderOutputStream oeos = null;
-        ObjectDecoderInputStream odis = null;
+        Network net = new Network();
         try {
-            Socket socket = new Socket("localhost", 8189);
-            System.out.println("Connected");
-            System.out.flush();
-            oeos = new ObjectEncoderOutputStream(socket.getOutputStream());
-            odis = new ObjectDecoderInputStream(socket.getInputStream());
-            AuthMessage authMessage = new AuthMessage("User3", "12345", false);
-            oeos.writeObject(authMessage);
-            oeos.flush();
-            ServerCallbackMessage answer = (ServerCallbackMessage) odis.readObject();
-            System.out.println(answer.getStatus().name());
-            System.out.flush();
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            net.connect("localhost", 8189);
+            net.addToQueue(new AuthMessage("User111", "12345", true));
+            AbstractMessage msg;
+            while((msg = net.getAnswer()) == null) {}
+            if(msg instanceof ServerCallbackMessage) {
+                System.out.println(((ServerCallbackMessage)msg).getStatus());
             }
-            FileMessage file = new FileMessage("Example.txt", Files.readAllBytes(Paths.get("Example.txt")));
-            oeos.writeObject(file);
-            oeos.flush();
-            answer = (ServerCallbackMessage) odis.readObject();
-            System.out.println(answer.getStatus().name());
-            System.out.flush();*/
-            /*oeos.writeObject(new CmdMessage("Ping"));
-            oeos.flush();
-            System.out.println(((ServerCallbackMessage) odis.readObject()).getStatus());
-            System.out.flush();*/
-        /*} catch (IOException e) {
+            net.disconnect();
+        } catch (IOException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                oeos.close();
-                odis.close();
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }*/
+        }
     }
 
     private static FilesMessage getFiles(String user, String filePath) throws IOException {
