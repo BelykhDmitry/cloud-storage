@@ -32,13 +32,6 @@ public  class  Network {
         odis = new ObjectDecoderInputStream(sock.getInputStream());
         output = new Thread(() -> {
             try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            //ObjectEncoderOutputStream oeos = null;
-            try {
-                //oeos = new ObjectEncoderOutputStream(sock.getOutputStream());
                 while(!Thread.currentThread().isInterrupted()) {
                     if (outQueue.size() > 0) {
                         oeos.writeObject(outQueue.poll());
@@ -61,14 +54,7 @@ public  class  Network {
             }
         });
         input = new Thread(() -> {
-            //ObjectDecoderInputStream odis = null;
             try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            try {
-                //odis = new ObjectDecoderInputStream(sock.getInputStream());
                 while(!Thread.currentThread().isInterrupted()) {
                     if(odis.available() > 0) {
                         inQueue.add((AbstractMessage) odis.readObject());
