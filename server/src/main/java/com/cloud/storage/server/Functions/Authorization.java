@@ -1,6 +1,7 @@
 package com.cloud.storage.server.Functions;
 
 import com.cloud.storage.common.AuthMessage;
+import com.cloud.storage.common.CmdMessage;
 import com.cloud.storage.common.ServerCallbackMessage;
 import com.sun.istack.internal.NotNull;
 import io.netty.handler.codec.serialization.ClassResolvers;
@@ -33,7 +34,7 @@ public class Authorization {
         try {
             ResultSet resultSet = statement.executeQuery("SELECT Pas FROM Users WHERE Name LIKE '"+ msg.getName() +"';");
             if (resultSet.next()) {
-                result = msg.getPass() == Integer.parseInt(resultSet.getString(1));
+                result = msg.getPass() == resultSet.getString(1).hashCode();
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -48,6 +49,18 @@ public class Authorization {
             preparedStatement.execute();
             connection.commit();
             result = true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    public boolean changePass (String user, CmdMessage msg) {
+        boolean result = false;
+        try {
+            preparedStatement = connection.prepareStatement("UPDATE Users SET Pas='"+msg.getCmd()+"' WHERE Name LIKE '"+user+"';");
+            preparedStatement.execute();
+            connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
         }

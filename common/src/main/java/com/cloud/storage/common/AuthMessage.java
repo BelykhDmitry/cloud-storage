@@ -9,7 +9,12 @@ public class AuthMessage extends AbstractMessage {
 
     public AuthMessage(String name, String pass, boolean isRegistration) {
         this.name = name;
-        this.pass = pass.hashCode();
+        if(isRegistration) {
+            this.pass = pass.hashCode();
+        } else {
+            this.pass = Integer.toString(pass.hashCode()).hashCode();
+        }
+
         this.isRegistration = isRegistration;
     }
 

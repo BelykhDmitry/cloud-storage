@@ -33,6 +33,7 @@ public class FileManager {
     public void writeFile(String user, FileMessage msg) { // TODO: Продумать, как лучше создавать поддиректории. Склоняюсь к отдельному запросу - не должно сильно загрузить сеть
         try {
             String path = rootFolder + user+ "\\" + msg.getFileRelativePathName(); // FIXME: Проверка поддиректорий
+            System.out.println("Received from " + user + ": " + msg.getFileRelativePathName() + " " + msg.getChecksum()+ ":" + msg.checkSum());
             //Files.createDirectories(Paths.get(path).getRoot());
             Files.write(Paths.get(path), msg.getData());
         } catch (IOException e) {

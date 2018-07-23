@@ -47,6 +47,7 @@ public class CmdManager {
                     //FileManager.getInstance().getFiles(user, "");
                     ServerCallBack.directoryTransfer(ctx, FileManager.getInstance().getFiles(user, ""));
                     break;
+                case CHANGE_PASS:
                 default:throw new IOException("Неопознанная команда");
             }
         } catch (IOException e) {

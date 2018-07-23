@@ -102,7 +102,7 @@ public class Main {
     }
 
     private static void client() {
-        int j = 10;
+        int j = 1;
         new Thread(() -> {
             try {
                 Thread.sleep(1000);
@@ -123,23 +123,23 @@ public class Main {
                 ServerCallbackMessage answer = (ServerCallbackMessage) odis.readObject();
                 System.out.println(answer.getStatus().name());
                 System.out.flush();
-                oeos.writeObject(new CmdMessage("", CmdMessage.CmdType.GET_PATHS_LIST));
+                /*oeos.writeObject(new CmdMessage("", CmdMessage.CmdType.GET_PATHS_LIST));
                 oeos.flush();
                 Object obj = odis.readObject();
                 if(obj instanceof FilesMessage)
-                    ((FilesMessage) obj).getList().forEach(fileMessage -> System.out.println(fileMessage.getFileRelativePathName()));
+                    ((FilesMessage) obj).getList().forEach(fileMessage -> System.out.println(fileMessage.getFileRelativePathName()));*/
 //                    oeos.writeObject(new CmdMessage("Задача1.png", CmdMessage.CmdType.REMOVE_FILE));
 //                    oeos.flush();
 //                    System.out.println(answer.getStatus().name());
 //                    System.out.flush();
-                /*String fileName = "Задача1.png";
-                FileMessage file = new FileMessage(fileName, Files.readAllBytes(Paths.get(fileName)));
+                String fileName = "Задача1.png";
+                FileMessage file = new FileMessage(fileName, false, Files.readAllBytes(Paths.get(fileName)), Paths.get(fileName).toFile().length());
                 oeos.writeObject(file);
                 oeos.flush();
                 answer = (ServerCallbackMessage) odis.readObject();
                 System.out.println(answer.getStatus().name());
                 System.out.flush();
-                fileName = "C:\\Users\\Dmitrii\\Desktop\\Счёт оплата контактов.pdf";
+                /*fileName = "C:\\Users\\Dmitrii\\Desktop\\Счёт оплата контактов.pdf";
                 file = new FileMessage("Счёт оплата контактов.pdf", Files.readAllBytes(Paths.get(fileName)));
                 oeos.writeObject(file);
                 oeos.flush();
