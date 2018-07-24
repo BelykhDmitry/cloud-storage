@@ -127,6 +127,7 @@ public  class  Network {
 
     public void removeListener(InputListener listener) {
         listeners.remove(listener);
+        listeners.trimToSize();
     }
 
     private <T extends AbstractMessage> void fireListeners(T msg) {
