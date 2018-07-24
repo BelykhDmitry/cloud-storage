@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.cloud.storage.client.MainWindowController"
+            prefHeight="400.0" prefWidth="600.0">
+
+    <VBox fx:id="mainVBox">
+        <HBox alignment="CENTER">
+            <Button text="Add File" onAction="#btnAddFile">
+
+            </Button>
+            <Button text="Add Folder" onAction="#btnAddFolder">
+
+            </Button>
+            <Button text="Download File" onAction="#btnDownloadFile">
+
+            </Button>
+            <Button text="Delete" onAction="#btnDeleteFile">
+
+            </Button>
+            <Button text="Rename" onAction="#btnRename">
+
+            </Button>
+            <Button text="Exit" onAction="#btnExit">
+
+            </Button>
+        </HBox>
+        <TreeTableView fx:id="pathView"/>
+    </VBox>
+
+</StackPane>

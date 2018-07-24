@@ -9,10 +9,22 @@ import javafx.stage.Stage;
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("/sample.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/auth.fxml"));
         primaryStage.setTitle("Cloud Storage Client");
         primaryStage.setScene(new Scene(root, 400, 400));
         primaryStage.show();
+    }
+
+    @Override
+    public void init() throws Exception {
+        super.init();
+        Network.getInstance().connect("localhost", 8189);
+    }
+
+    @Override
+    public void stop() throws Exception {
+        Network.getInstance().disconnect();
+        super.stop();
     }
 
     public static void main(String[] args) {

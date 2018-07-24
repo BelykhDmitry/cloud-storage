@@ -16,19 +16,19 @@ public class Main {
     private static String rootFolder = "C:\\Users\\Dmitrii\\Cloud\\";
 
     private static void run() {
-        Network net = new Network();
-        try {
-            net.connect("localhost", 8189);
-            net.addToQueue(new AuthMessage("User111", "12345", false));
-            AbstractMessage msg;
-            while((msg = net.getAnswer()) == null) {}
-            if(msg instanceof ServerCallbackMessage) {
-                System.out.println(((ServerCallbackMessage)msg).getStatus());
-            }
-            net.disconnect();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        Network net = new Network();
+//        try {
+//            net.connect("localhost", 8189);
+//            net.addToQueue(new AuthMessage("User111", "12345", false));
+//            AbstractMessage msg;
+//            while((msg = net.getAnswer()) == null) {}
+//            if(msg instanceof ServerCallbackMessage) {
+//                System.out.println(((ServerCallbackMessage)msg).getStatus());
+//            }
+//            net.disconnect();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     private static FilesMessage getFiles(String user, String filePath) throws IOException {

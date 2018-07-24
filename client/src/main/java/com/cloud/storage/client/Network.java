@@ -9,11 +9,12 @@ import java.io.Serializable;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 public  class  Network {
+
+    public static volatile Network instance;
+
     private Socket sock;
     private Queue<Serializable> outQueue;
     private Queue<AbstractMessage> inQueue; //Целесообразность? Пока оставлю
@@ -22,10 +23,20 @@ public  class  Network {
     private Thread input;
     private Thread output;
     private ArrayList<InputListener> listeners;
+    private Semaphore smp = new Semaphore(1);
 
-    public Network() {
+    private Network() {
+
         outQueue = new ConcurrentLinkedQueue<>();
         inQueue = new ConcurrentLinkedQueue<>();
+        listeners = new ArrayList<>();
+    }
+
+    public static Network getInstance() {
+        if (instance == null) {
+            instance = new Network();
+        }
+        return instance;
     }
 
     public void connect(String host, int port) throws IOException {
@@ -61,9 +72,9 @@ public  class  Network {
                     if(odis.available() > 0) {
                         inQueue.add((AbstractMessage) odis.readObject());
                     }
-                    if(inQueue.size() > 0) {  // Оставить здесь? Продумать механизм защиты в случае прерывания, чтобы не было потери сообщений
-                        fireListeners(inQueue.poll());
-                    }
+//                    if(inQueue.size() > 0) {  // Оставить здесь? Продумать механизм защиты в случае прерывания, чтобы не было потери сообщений
+//                        fireListeners(inQueue.poll());
+//                    }
                 }
                 throw new InterruptedException();
             } catch (ClassNotFoundException e) {
@@ -86,6 +97,7 @@ public  class  Network {
         input.setDaemon(true);
         output.start();
         input.start();
+        System.out.println("Connected");
     }
 
     public void disconnect() throws IOException {
@@ -98,6 +110,7 @@ public  class  Network {
             e.printStackTrace();
         }
         sock.close();
+        System.out.println("Disconnected");
     }
 
     public <T extends AbstractMessage> void addToQueue  (T msg) {
@@ -117,8 +130,18 @@ public  class  Network {
     }
 
     private <T extends AbstractMessage> void fireListeners(T msg) {
-        for(InputListener listener : listeners) {
-            listener.onMsgReceived(msg);
+        try {
+            smp.acquire();
+            for(InputListener listener : listeners) {
+                listener.onMsgReceived(msg);
+            }
+            smp.release();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+    }
+
+    public boolean getStatus() {
+        return sock != null;
     }
 }
