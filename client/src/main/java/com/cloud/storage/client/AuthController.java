@@ -42,7 +42,8 @@ public class AuthController implements Initializable, InputListener {
         Parent root = null;
         try {
             root = FXMLLoader.load(getClass().getResource("/mainWindow.fxml"));
-            ((Stage) mainVBox.getScene().getWindow()).setScene(new Scene(root, 600, 400));
+            Stage stage = (Stage) mainVBox.getScene().getWindow();
+            stage.setScene(new Scene(root, 600, 400));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -60,7 +61,7 @@ public class AuthController implements Initializable, InputListener {
         if (authorized) {
             changeScreen();
         } else {
-            new Alert(Alert.AlertType.CONFIRMATION, "Wrong username or password", ButtonType.OK, ButtonType.CANCEL).showAndWait();
+            new Alert(Alert.AlertType.ERROR, "Wrong username or password", ButtonType.OK, ButtonType.CANCEL).showAndWait();
         }
         Network.getInstance().removeListener(this);
     }

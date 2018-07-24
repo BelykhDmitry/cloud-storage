@@ -21,10 +21,14 @@ public class MainWindowController implements Initializable {
     @FXML
     TreeTableView<FileMessage> pathView;
 
+    MessageController messageController;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("Init");
         initPathView();
+        messageController = new MessageController();
+        //Network.getInstance().addListener(messageController); // Как узнать, когда окно закрывается? Чтобы отписаться от рыссылки. Возможно стоит подписываться и отписываться когда сообщение ожидается
     }
 
     private void initPathView() {
