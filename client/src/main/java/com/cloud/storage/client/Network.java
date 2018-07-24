@@ -7,6 +7,7 @@ import io.netty.handler.codec.serialization.ObjectEncoderOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
@@ -15,11 +16,12 @@ import java.util.concurrent.Executors;
 public  class  Network {
     private Socket sock;
     private Queue<Serializable> outQueue;
-    private Queue<Serializable> inQueue;
+    private Queue<AbstractMessage> inQueue; //Целесообразность? Пока оставлю
     private ObjectEncoderOutputStream oeos;
     private ObjectDecoderInputStream odis;
     private Thread input;
     private Thread output;
+    private ArrayList<InputListener> listeners;
 
     public Network() {
         outQueue = new ConcurrentLinkedQueue<>();
@@ -58,6 +60,9 @@ public  class  Network {
                 while(!Thread.currentThread().isInterrupted()) {
                     if(odis.available() > 0) {
                         inQueue.add((AbstractMessage) odis.readObject());
+                    }
+                    if(inQueue.size() > 0) {  // Оставить здесь? Продумать механизм защиты в случае прерывания, чтобы не было потери сообщений
+                        fireListeners(inQueue.poll());
                     }
                 }
                 throw new InterruptedException();
@@ -99,7 +104,21 @@ public  class  Network {
         this.outQueue.add(msg);
     }
 
-    public AbstractMessage getAnswer () {
+    public AbstractMessage getAnswer () { // TODO: Стоит убрать
         return (AbstractMessage) inQueue.poll();
+    }
+
+    public void addListener(InputListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeListener(InputListener listener) {
+        listeners.remove(listener);
+    }
+
+    private <T extends AbstractMessage> void fireListeners(T msg) {
+        for(InputListener listener : listeners) {
+            listener.onMsgReceived(msg);
+        }
     }
 }
