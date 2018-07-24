@@ -8,10 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -33,6 +30,8 @@ public class AuthController implements Initializable, InputListener {
     @FXML
     PasswordField password;
 
+    @FXML
+    CheckBox registration;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -55,7 +54,7 @@ public class AuthController implements Initializable, InputListener {
         Network.getInstance().addListener(this);
         System.out.println(login.getText() + " " + password.getText());
         if (Network.getInstance().getStatus())
-            Network.getInstance().addToQueue(new AuthMessage(login.getText(), password.getText(), false));
+            Network.getInstance().addToQueue(new AuthMessage(login.getText(), password.getText(), registration.isSelected()));
         AbstractMessage msg;
         while(!serverCallBack) {}
         if (authorized) {

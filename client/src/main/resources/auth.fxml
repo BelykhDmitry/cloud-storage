@@ -18,6 +18,11 @@
             <Insets bottom="10.0" />
         </VBox.margin></TextField>
     <PasswordField fx:id="password" maxWidth="200" promptText="Password" />
+    <CheckBox fx:id="registration" text="Регистрация">
+        <VBox.margin>
+            <Insets top="10.0" />
+        </VBox.margin>
+    </CheckBox>
     <Button onAction="#auth" prefWidth="200" text="Authorization">
         <opaqueInsets>
             <Insets />
