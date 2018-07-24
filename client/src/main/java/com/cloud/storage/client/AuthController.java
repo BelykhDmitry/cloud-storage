@@ -19,9 +19,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class AuthController implements Initializable {
+public class AuthController implements Initializable, InputListener {
 
-    private boolean authorized = false;
+    private volatile boolean authorized = false;
+    private volatile boolean serverCallBack = false;
 
     @FXML
     VBox mainVBox;
@@ -31,23 +32,11 @@ public class AuthController implements Initializable {
 
     @FXML
     PasswordField password;
-    InputListener listener = new InputListener() {
-        @Override
-        public <T extends AbstractMessage> void onMsgReceived(T msg) {
-            if (msg instanceof ServerCallbackMessage)
-                if (((ServerCallbackMessage) msg).getStatus() == ServerCallbackMessage.Answer.OK) {
-                    Network.getInstance().removeListener(listener);
-                    authorized = true;
-                } else {
-                    new Alert(Alert.AlertType.CONFIRMATION, "Wrong username or password", ButtonType.OK, ButtonType.CANCEL).showAndWait();
-                }
-        }
-    };
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println(location);
-        Network.getInstance().addListener(listener);
     }
 
     private void changeScreen() {
@@ -61,25 +50,29 @@ public class AuthController implements Initializable {
     }
 
     public void auth() {
+        serverCallBack = false;
+        authorized = false;
+        Network.getInstance().addListener(this);
         System.out.println(login.getText() + " " + password.getText());
         if (Network.getInstance().getStatus())
             Network.getInstance().addToQueue(new AuthMessage(login.getText(), password.getText(), false));
         AbstractMessage msg;
-        while(!authorized){
-            msg = Network.getInstance().getAnswer();
-            if(msg != null) {
-                if(msg instanceof ServerCallbackMessage)
-                    switch(((ServerCallbackMessage)msg).getStatus()) {
-                        case OK:
-                            authorized = true;
-                            break;
-                        case FAIL:
-                            new Alert(Alert.AlertType.CONFIRMATION, "Wrong username or password", ButtonType.OK, ButtonType.CANCEL).showAndWait();
-                            break;
-                    }
-                    break;
-            }
+        while(!serverCallBack) {}
+        if (authorized) {
+            changeScreen();
+        } else {
+            new Alert(Alert.AlertType.CONFIRMATION, "Wrong username or password", ButtonType.OK, ButtonType.CANCEL).showAndWait();
         }
-        if(authorized) changeScreen();
+        Network.getInstance().removeListener(this);
+    }
+
+    @Override
+    public <T extends AbstractMessage> void onMsgReceived(T msg) {
+        if (msg instanceof ServerCallbackMessage) {
+            if (((ServerCallbackMessage) msg).getStatus() == ServerCallbackMessage.Answer.OK) {
+                authorized = true;
+            }
+            serverCallBack = true;
+        }
     }
 }

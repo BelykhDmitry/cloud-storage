@@ -72,9 +72,9 @@ public  class  Network {
                     if(odis.available() > 0) {
                         inQueue.add((AbstractMessage) odis.readObject());
                     }
-//                    if(inQueue.size() > 0) {  // Оставить здесь? Продумать механизм защиты в случае прерывания, чтобы не было потери сообщений
-//                        fireListeners(inQueue.poll());
-//                    }
+                    if(inQueue.size() > 0) {  // Оставить здесь? Продумать механизм защиты в случае прерывания, чтобы не было потери сообщений
+                        fireListeners(inQueue.poll());
+                    }
                 }
                 throw new InterruptedException();
             } catch (ClassNotFoundException e) {
