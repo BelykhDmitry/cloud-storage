@@ -4,11 +4,16 @@ import com.cloud.storage.common.FileMessage;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -49,6 +54,16 @@ public class MainWindowController implements Initializable {
     }
 
     public void btnAddFile() {
+        Parent root = null;
+        try {
+            root = FXMLLoader.load(getClass().getResource("/fileBrowser.fxml"));
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root, 600, 400));
+            stage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         System.out.println("Add File");
         if (pathView.getSelectionModel().isEmpty()) {
             pathView.getRoot().getChildren().add(new TreeItem<>(new FileMessage("New File", false, null, (long)(Math.random()*1000))));

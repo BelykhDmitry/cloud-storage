@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.cloud.storage.client.FileBrowser"
+      prefHeight="400.0" prefWidth="600.0"
+      fx:id="mainVBox">
+    <TreeView fx:id="pathView"/>
+    <HBox>
+        <Button text="Download" onAction="#btnDownload">
+            <HBox.margin>
+                <Insets right="5.0"/>
+            </HBox.margin>
+        </Button>
+        <Button text="Cancel" onAction="#btnCancel"/>
+    </HBox>
+</VBox>
