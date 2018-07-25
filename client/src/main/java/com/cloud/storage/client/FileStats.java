@@ -3,7 +3,7 @@ package com.cloud.storage.client;
 import javafx.beans.property.*;
 
 public class FileStats {
-    private BooleanProperty isDirectory; // TODO: Продумать преобразование к универсальному сообщению для передачи файлов/каталогов
+    private BooleanProperty isDirectory;
     private StringProperty fileRelativePathName;
     private StringProperty size;
 

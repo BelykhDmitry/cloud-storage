@@ -9,8 +9,8 @@ public class CmdMessage extends AbstractMessage {
         REMOVE_FOLDER,
         GET_FILE,
         REMOVE_FILE,
-        GET_PATHS_LIST, // TODO: Реализация передачи мета-информации о хранилище
-        GET_FOLDER, //Продумать реализацию. Через List файлов?
+        GET_PATHS_LIST,
+        GET_FOLDER,     //Нужно ли. Передавать как очередь сообщений начиная с корневой папки рекурсивно
         CHANGE_PASS,
         RENAME
     }
@@ -31,5 +31,4 @@ public class CmdMessage extends AbstractMessage {
     public String getCmd() {
         return cmd;
     }
-    // TODO: Add Folders (TreeItem)
 }

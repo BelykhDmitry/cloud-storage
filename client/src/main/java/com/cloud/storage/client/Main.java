@@ -15,12 +15,7 @@ public class Main extends Application {
         primaryStage.setTitle("Cloud Storage Client");
         primaryStage.setScene(new Scene(root, 400, 400));
         primaryStage.show();
-        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
-                Network.getInstance().removeAll();
-            }
-        });
+        primaryStage.setOnCloseRequest(event -> Network.getInstance().removeAll());
     }
 
     @Override

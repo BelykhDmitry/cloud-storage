@@ -41,33 +41,26 @@ public class MainWindowController implements Initializable {
         System.out.println("Init");
         initPathView();
         msgController = new MessageController(this);
-        Network.getInstance().addListener(msgController); // Как узнать, когда окно закрывается? Чтобы отписаться от рыссылки. Возможно стоит подписываться и отписываться когда сообщение ожидается
+        Network.getInstance().addListener(msgController);
         Network.getInstance().addToQueue(new CmdMessage("", CmdMessage.CmdType.GET_PATHS_LIST));
     }
 
     private void initPathView() {
-        //Запрос на сервак
         FileStats msg = new FileStats("/", true, Integer.toString(0));
         root = new TreeItem<>(msg);
         pathView.setRoot(root);
         pathView.setShowRoot(false);
         TreeTableColumn<FileStats, String> nameColumn = new TreeTableColumn<>("Name");
-        //TreeTableColumn<FileMessage, Boolean> isDirectoryColumn = new TreeTableColumn<>("Is Directory");
         TreeTableColumn<FileStats, String> sizeColumn = new TreeTableColumn<>("Size");
-        nameColumn.setEditable(true);
         nameColumn.setCellValueFactory(param -> param.getValue().getValue().getRelativeNameProperty());
-        //isDirectoryColumn.setCellValueFactory(param -> param.getValue().getValue().getIsDirectoryProperty());
         sizeColumn.setCellValueFactory(param -> param.getValue().getValue().getSizeProperty());
         nameColumn.setMinWidth(300);
         sizeColumn.setMinWidth(100);
         pathView.getColumns().setAll(nameColumn, sizeColumn);
         pathView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        pathView.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if(event.getClickCount() == 2) {
-                    btnDownloadFile();
-                }
+        pathView.setOnMouseClicked(event -> {
+            if(event.getClickCount() == 2) {
+                btnDownloadFile();
             }
         });
     }
@@ -157,7 +150,7 @@ public class MainWindowController implements Initializable {
         } else {}
     }
 
-    public void btnRename(ActionEvent actionEvent) {
+    public void btnRename() {
         System.out.println("Rename");
         if (pathView.getSelectionModel().isEmpty()) {
             new Alert(Alert.AlertType.ERROR, "No File or Folder selected", ButtonType.OK, ButtonType.CANCEL).showAndWait();

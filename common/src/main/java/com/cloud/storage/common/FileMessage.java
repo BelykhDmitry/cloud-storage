@@ -10,26 +10,22 @@ public class FileMessage extends AbstractMessage {
 
     // Передача файла от/к Серверу
 
-    private boolean isDirectory; // TODO: Продумать преобразование к универсальному сообщению для передачи файлов/каталогов
+    private boolean isDirectory;
     private String fileRelativePathName;
     private long size;
     private byte[] data;
-    private long checksum; // Возможно стоит считать хэш сумму для всех полей сообщения и сделать метод абстрактным
+    private long checksum;
 
     public FileMessage(String fileRelativePathName, boolean isDirectory, byte[] data, long size) {
         this.fileRelativePathName = fileRelativePathName;
         this.isDirectory = isDirectory;
         this.data = data;
         this.size = size;
-        checksum = 0;//calcChecksum();
+        checksum = 0;// TODO calcChecksum();
     }
 
     public String getFileRelativePathName() {
         return fileRelativePathName;
-    }
-
-    public void setData(byte[] data) {
-        this.data = data;
     }
 
     public byte[] getData() {
@@ -38,7 +34,7 @@ public class FileMessage extends AbstractMessage {
 
     public boolean isDirectory() {
         return isDirectory;
-    }
+    } //TODO: Возможно стоит убрать
 
     public long getSize() {
         return size;
@@ -60,8 +56,4 @@ public class FileMessage extends AbstractMessage {
     public boolean checkSum() {
         return checksum == calcChecksum();
     }
-
-    //public StringProperty getRelativeNameProperty() {return fileRelativePathName;}
-    //public BooleanProperty getIsDirectoryProperty() {return isDirectory;}
-    //public StringProperty getSizeProperty() {return new SimpleStringProperty(Long.toString(size.get()));}
 }

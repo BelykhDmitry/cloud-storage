@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class SortHandler extends ChannelInboundHandlerAdapter {
 
     private String userName;
-    private boolean blocked = false;
+    //private boolean blocked = false;
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {

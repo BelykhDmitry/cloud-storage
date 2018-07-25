@@ -13,7 +13,7 @@ import java.util.concurrent.*;
 
 public  class  Network {
 
-    public static volatile Network instance;
+    private static volatile Network instance;
 
     private Socket sock;
     private Queue<Serializable> outQueue;//Целесообразность? Пока оставлю
@@ -26,7 +26,6 @@ public  class  Network {
     private Semaphore smp = new Semaphore(1);
 
     private Network() {
-
         outQueue = new ConcurrentLinkedQueue<>();
         inQueue = new ConcurrentLinkedQueue<>();
         listeners = new ArrayList<>();
@@ -72,12 +71,11 @@ public  class  Network {
         input = new Thread(() -> {
             try {
                 while(!Thread.currentThread().isInterrupted()) {
-                    //System.out.println("Available " + odis.available());
                     try {
                         if (odis.available() > 0) {
                             inQueue.add((AbstractMessage) odis.readObject());
                         }
-                        if (inQueue.size() > 0) {  // Оставить здесь? Продумать механизм защиты в случае прерывания, чтобы не было потери сообщений
+                        if (inQueue.size() > 0) {
                             fireListeners(inQueue.poll());
                         }
                         Thread.sleep(500);
@@ -124,10 +122,6 @@ public  class  Network {
         this.outQueue.add(msg);
     }
 
-    public AbstractMessage getAnswer () { // TODO: Стоит убрать
-        return (AbstractMessage) inQueue.poll();
-    }
-
     public void addListener(InputListener listener) {
         listeners.add(listener);
         System.out.println("New Listener");
@@ -140,7 +134,7 @@ public  class  Network {
     }
 
     public void removeAll() {
-        listeners.removeAll(listeners);
+        listeners.removeAll(listeners); //FIXME
         System.out.println(listeners.size());
     }
 

@@ -21,21 +21,16 @@ public class MessageController implements InputListener{
 
     private String fileSavePath;
 
-    public String getFileSavePath() {
-        return fileSavePath;
-    }
-
     public void setFileSavePath(String fileSavePath) {
         this.fileSavePath = fileSavePath;
     }
 
-    public MessageController(MainWindowController ctrl) {
+    MessageController(MainWindowController ctrl) {
         this.ctrl = ctrl;
     }
 
     @Override
     public <T extends AbstractMessage> void onMsgReceived(T msg) {
-        // Methods from Controller
         if (msg instanceof ServerCallbackMessage) {
             System.out.println("New Callback:");
             System.out.println(((ServerCallbackMessage)msg).getStatus());
@@ -49,7 +44,6 @@ public class MessageController implements InputListener{
                     Files.write(Paths.get(fileSavePath+"\\"+in.getFileRelativePathName()), in.getData());
                 } catch (IOException e) {
                     e.printStackTrace();
-                    //new Alert(Alert.AlertType.ERROR, "Error File writing! Try one more" + in.getFileRelativePathName(), ButtonType.OK, ButtonType.CANCEL);
                 } finally {
                     fileSavePath = null;
                 }

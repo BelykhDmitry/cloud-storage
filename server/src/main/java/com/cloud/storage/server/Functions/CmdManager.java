@@ -26,23 +26,23 @@ public class CmdManager {
     }
 
     @NotNull
-    public void processCmd (String user, CmdMessage cmd, ChannelHandlerContext ctx) { // TODO: Реализовать ответы для контекста
+    public void processCmd (String user, CmdMessage cmd, ChannelHandlerContext ctx) {
         try {
             switch (cmd.getCmdType()) {
-                case REMOVE_FOLDER: //CallBack: ServerCallbackMessage OK or FAIL
+                case REMOVE_FOLDER:
                     FileManager.getInstance().removeDir(user, cmd.getCmd());
                     ServerCallBack.serverAnswer(ctx, ServerCallbackMessage.Answer.OK);
                     ServerCallBack.directoryTransfer(ctx, new FilesMessage(FileManager.getInstance().getXMLTree(user,"")));
                     break;
-                case GET_FILE: // TODO: Extra class for multi-file transfer or modification of FileMessage
+                case GET_FILE:
                     ServerCallBack.fileTransfer(ctx, FileManager.getInstance().readFile(user, cmd.getCmd()));
                     break;
-                case CREATE_FOLDER: //CallBack: ServerCallbackMessage OK or FAIL
+                case CREATE_FOLDER:
                     FileManager.getInstance().makeDir(user, cmd.getCmd());
                     ServerCallBack.serverAnswer(ctx, ServerCallbackMessage.Answer.OK);
                     ServerCallBack.directoryTransfer(ctx, new FilesMessage(FileManager.getInstance().getXMLTree(user,"")));
                     break;
-                case REMOVE_FILE: //CallBack: ServerCallbackMessage OK or FAIL
+                case REMOVE_FILE:
                     FileManager.getInstance().removeFile(user, cmd.getCmd());
                     ServerCallBack.serverAnswer(ctx, ServerCallbackMessage.Answer.OK);
                     ServerCallBack.directoryTransfer(ctx, new FilesMessage(FileManager.getInstance().getXMLTree(user,"")));

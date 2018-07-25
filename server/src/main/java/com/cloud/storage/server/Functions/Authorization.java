@@ -61,6 +61,7 @@ public class Authorization {
             preparedStatement = connection.prepareStatement("UPDATE Users SET Pas='"+msg.getCmd()+"' WHERE Name LIKE '"+user+"';");
             preparedStatement.execute();
             connection.commit();
+            result = true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
