@@ -10,22 +10,22 @@ public class FileMessage extends AbstractMessage {
 
     // Передача файла от/к Серверу
 
-    private BooleanProperty isDirectory; // TODO: Продумать преобразование к универсальному сообщению для передачи файлов/каталогов
-    private StringProperty fileRelativePathName;
-    private LongProperty size;
+    private boolean isDirectory; // TODO: Продумать преобразование к универсальному сообщению для передачи файлов/каталогов
+    private String fileRelativePathName;
+    private long size;
     private byte[] data;
     private long checksum; // Возможно стоит считать хэш сумму для всех полей сообщения и сделать метод абстрактным
 
     public FileMessage(String fileRelativePathName, boolean isDirectory, byte[] data, long size) {
-        this.fileRelativePathName = new SimpleStringProperty(fileRelativePathName);
-        this.isDirectory = new SimpleBooleanProperty(isDirectory);
+        this.fileRelativePathName = fileRelativePathName;
+        this.isDirectory = isDirectory;
         this.data = data;
-        this.size = new SimpleLongProperty(size);
+        this.size = size;
         checksum = 0;//calcChecksum();
     }
 
     public String getFileRelativePathName() {
-        return fileRelativePathName.get();
+        return fileRelativePathName;
     }
 
     public void setData(byte[] data) {
@@ -37,11 +37,11 @@ public class FileMessage extends AbstractMessage {
     }
 
     public boolean isDirectory() {
-        return isDirectory.get();
+        return isDirectory;
     }
 
     public long getSize() {
-        return size.get();
+        return size;
     }
 
     public long getChecksum() {
@@ -51,9 +51,9 @@ public class FileMessage extends AbstractMessage {
     private long calcChecksum() {
         CRC32 crc32 = new CRC32();
         crc32.update(data);
-        crc32.update(Boolean.toString(isDirectory.get()).getBytes());
-        crc32.update(fileRelativePathName.get().getBytes());
-        crc32.update(Double.toString(size.get()).getBytes());
+        crc32.update(Boolean.toString(isDirectory).getBytes());
+        crc32.update(fileRelativePathName.getBytes());
+        crc32.update(Double.toString(size).getBytes());
         return crc32.getValue();
     }
 
@@ -61,7 +61,7 @@ public class FileMessage extends AbstractMessage {
         return checksum == calcChecksum();
     }
 
-    public StringProperty getRelativeNameProperty() {return fileRelativePathName;}
-    public BooleanProperty getIsDirectoryProperty() {return isDirectory;}
-    public StringProperty getSizeProperty() {return new SimpleStringProperty(Long.toString(size.get()));}
+    //public StringProperty getRelativeNameProperty() {return fileRelativePathName;}
+    //public BooleanProperty getIsDirectoryProperty() {return isDirectory;}
+    //public StringProperty getSizeProperty() {return new SimpleStringProperty(Long.toString(size.get()));}
 }

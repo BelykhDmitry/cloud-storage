@@ -32,15 +32,11 @@ public class FileManager {
 
     //public void setPath(String path) {this.rootFolder = path;}
 
-    public void writeFile(String user, FileMessage msg) { // TODO: Продумать, как лучше создавать поддиректории. Склоняюсь к отдельному запросу - не должно сильно загрузить сеть
-        try {
-            String path = rootFolder + user+ "\\" + msg.getFileRelativePathName(); // FIXME: Проверка поддиректорий
-            System.out.println("Received from " + user + ": " + msg.getFileRelativePathName() + " " + msg.getChecksum()+ ":" + msg.checkSum());
-            //Files.createDirectories(Paths.get(path).getRoot());
-            Files.write(Paths.get(path), msg.getData());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void writeFile(String user, FileMessage msg) throws IOException { // TODO: Продумать, как лучше создавать поддиректории. Склоняюсь к отдельному запросу - не должно сильно загрузить сеть
+        String path = rootFolder + user + "\\" + msg.getFileRelativePathName(); // FIXME: Проверка поддиректорий
+        System.out.println("Received from " + user + ": " + msg.getFileRelativePathName() + " " + msg.getChecksum() + ":" + msg.checkSum());
+        //Files.createDirectories(Paths.get(path).getRoot());
+        Files.write(Paths.get(path), msg.getData());
     }
     public FileMessage readFile(String user, String fileRelativePath) throws IOException {
         Path p = Paths.get(rootFolder + user+ "\\" + fileRelativePath);

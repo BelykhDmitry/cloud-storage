@@ -12,10 +12,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -56,24 +59,44 @@ public class MainWindowController implements Initializable {
     }
 
     public void btnAddFile() {
-        Parent root = null;
+        FileChooser chooser = new FileChooser();
         try {
-            root = FXMLLoader.load(getClass().getResource("/fileBrowser.fxml"));
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root, 600, 400));
-            stage.showAndWait();
-        } catch (IOException e) {
+            File file = chooser.showOpenDialog(mainVBox.getScene().getWindow());
+            System.out.println(file.getName() + " " + file.length());
+            String relativeName = null;
+            if (pathView.getSelectionModel().isEmpty()) {
+                relativeName = file.getName();
+            } else if (pathView.getSelectionModel().getSelectedItem().getValue().isDirectory()) {
+                relativeName = getItemPath(pathView.getSelectionModel().getSelectedItem()) + "\\" + file.getName();
+            } else {
+                relativeName = getItemPath(pathView.getSelectionModel().getSelectedItem().getParent()) + "\\" + file.getName();
+            }
+            try {
+                Network.getInstance().addToQueue(new FileMessage(relativeName, file.isDirectory(), Files.readAllBytes(file.toPath()), file.length()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (NullPointerException e) {
             e.printStackTrace();
         }
+//        Parent root = null;
+//        try {
+//            root = FXMLLoader.load(getClass().getResource("/fileBrowser.fxml"));
+//            Stage stage = new Stage();
+//            stage.setScene(new Scene(root, 600, 400));
+//            stage.showAndWait();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
-        System.out.println("Add File");
-        if (pathView.getSelectionModel().isEmpty()) {
-            pathView.getRoot().getChildren().add(new TreeItem<>(new FileStats("New File", false, Double.toString(Math.random()*1000))));
-        } else if (pathView.getSelectionModel().getSelectedItem().getValue().isDirectory()) {
-            pathView.getSelectionModel().getSelectedItem().getChildren().add(new TreeItem<>(new FileStats("New File", false, Double.toString(Math.random()*1000))));
-        } else {
-            pathView.getSelectionModel().getSelectedItem().getParent().getChildren().add(new TreeItem<>(new FileStats("New File", false, Double.toString(Math.random()*1000))));
-        }
+//        System.out.println("Add File");
+//        if (pathView.getSelectionModel().isEmpty()) {
+//            pathView.getRoot().getChildren().add(new TreeItem<>(new FileStats("New File", false, Double.toString(Math.random()*1000))));
+//        } else if (pathView.getSelectionModel().getSelectedItem().getValue().isDirectory()) {
+//            pathView.getSelectionModel().getSelectedItem().getChildren().add(new TreeItem<>(new FileStats("New File", false, Double.toString(Math.random()*1000))));
+//        } else {
+//            pathView.getSelectionModel().getSelectedItem().getParent().getChildren().add(new TreeItem<>(new FileStats("New File", false, Double.toString(Math.random()*1000))));
+//        }
     }
 
     public void btnAddFolder() {
@@ -131,5 +154,4 @@ public class MainWindowController implements Initializable {
             return getItemPath(item.getParent()) + "\\" + path;
         } else return path;
     }
-
 }

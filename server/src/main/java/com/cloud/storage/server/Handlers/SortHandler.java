@@ -9,6 +9,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class SortHandler extends ChannelInboundHandlerAdapter {
@@ -34,9 +35,14 @@ public class SortHandler extends ChannelInboundHandlerAdapter {
             } else if (msg instanceof FileMessage) {
                 System.out.println(((FileMessage)msg).getFileRelativePathName() + ": " + ((FileMessage)msg).getData().length);
                 System.out.flush();
-                FileManager.getInstance().writeFile(userName, (FileMessage)msg);
-                ctx.write(new ServerCallbackMessage(ServerCallbackMessage.Answer.OK));
-                ctx.flush();
+                try {
+                    FileManager.getInstance().writeFile(userName, (FileMessage) msg);
+                    ctx.write(new ServerCallbackMessage(ServerCallbackMessage.Answer.OK));
+                    ctx.flush();
+                    CmdManager.getInstance().processCmd(userName, new CmdMessage("", CmdMessage.CmdType.GET_PATHS_LIST), ctx);
+                } catch (IOException e) {
+                    ctx.write(new ServerCallbackMessage(ServerCallbackMessage.Answer.FAIL));
+                }
             } else {
                 System.out.println("Неопознанный тип сообщения");
             }
