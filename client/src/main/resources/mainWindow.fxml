@@ -14,6 +14,10 @@
 
     <VBox fx:id="mainVBox">
         <HBox alignment="CENTER">
+            <VBox.margin>
+                <Insets bottom="5.0"/>
+                <Insets top="5.0"/>
+            </VBox.margin>
             <Button text="Add File" onAction="#btnAddFile">
                 <HBox.margin>
                     <Insets right="5.0"/>
@@ -46,7 +50,12 @@
             </Button>
             <Button text="Exit" onAction="#btnExit"/>
         </HBox>
-        <TreeTableView fx:id="pathView"/>
+        <TreeTableView fx:id="pathView">
+            <VBox.margin>
+                <Insets bottom="5.0"/>
+                <Insets top="5.0"/>
+            </VBox.margin>
+        </TreeTableView>
     </VBox>
 
 </StackPane>

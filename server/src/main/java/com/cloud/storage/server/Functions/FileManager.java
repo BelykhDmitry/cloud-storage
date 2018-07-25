@@ -82,6 +82,15 @@ public class FileManager {
         Files.delete(Paths.get(rootFolder + user + "\\" + filePath));
     }
 
+    public void rename(String user, String cmd) throws IOException {
+        String[] names = cmd.split("=>", 2);
+        if (names.length != 2)
+            throw new IOException("Неверная команда");
+        if(!new File(rootFolder + user + "\\" + names[0]).renameTo(new File(rootFolder + user + "\\" + names[1]))) {
+            throw new IOException("Не удалось переименовать файл");
+        }
+    }
+
     public String getXMLTree(String user, String filePath) {
         Path p = Paths.get(rootFolder + user + "\\" + filePath);
         StringBuilder strBuilder = new StringBuilder();
@@ -116,37 +125,6 @@ public class FileManager {
         }
         return strBuilder.toString();
     }
-
-//    public FilesMessage getFiles(String user, String filePath) throws IOException {
-////        Path p = Paths.get(rootFolder + user + "\\" + filePath);
-////        FilesMessage msg = new FilesMessage();
-////        Files.walkFileTree(p, new FileVisitor<Path>() {
-////            @Override
-////            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-////                if(dir.compareTo(p) != 0) {
-////                    msg.addToList(p.relativize(dir).toString(), attrs.isDirectory(), null, attrs.size());
-////                }
-////                return FileVisitResult.CONTINUE;
-////            }
-////
-////            @Override
-////            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-////                msg.addToList(p.relativize(file).toString(), attrs.isDirectory(), null, attrs.size());
-////                return FileVisitResult.CONTINUE;
-////            }
-////
-////            @Override
-////            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-////                return FileVisitResult.TERMINATE;
-////            }
-////
-////            @Override
-////            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-////                return FileVisitResult.CONTINUE;
-////            }
-////        });
-////        return msg;
-////    }
 
     public TreeItem<FileMessage> getUserTree(String user) {
         return getDirTree(new File(rootFolder + user));

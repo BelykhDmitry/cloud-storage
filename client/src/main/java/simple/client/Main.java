@@ -5,6 +5,7 @@ import com.cloud.storage.common.*;
 import io.netty.handler.codec.serialization.ObjectDecoderInputStream;
 import io.netty.handler.codec.serialization.ObjectEncoderOutputStream;
 
+import java.io.*;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.file.*;
@@ -16,6 +17,7 @@ public class Main {
     private static String rootFolder = "C:\\Users\\Dmitrii\\Cloud\\";
 
     private static void run() {
+        //new File("C:\\Users\\Dmitrii\\Desktop\\HW6.txt").renameTo(new File("C:\\Users\\Dmitrii\\Desktop\\HW7.txt"));
 //        Network net = new Network();
 //        try {
 //            net.connect("localhost", 8189);

@@ -53,6 +53,12 @@ public class CmdManager {
                     System.out.println("After transfer " + ctx.channel().bytesBeforeWritable());
                     break;
                 case CHANGE_PASS:
+                    break;
+                case RENAME:
+                    FileManager.getInstance().rename(user, cmd.getCmd());
+                    ServerCallBack.serverAnswer(ctx, ServerCallbackMessage.Answer.OK);
+                    ServerCallBack.directoryTransfer(ctx, new FilesMessage(FileManager.getInstance().getXMLTree(user,"")));
+                    break;
                 default:throw new IOException("Неопознанная команда");
             }
         } catch (IOException e) {

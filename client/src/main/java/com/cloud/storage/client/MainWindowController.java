@@ -138,10 +138,37 @@ public class MainWindowController implements Initializable {
 
     public void btnExit() {
         System.out.println("Exit");
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Do you want to Exit?", ButtonType.OK, ButtonType.CANCEL);
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get().getText().equals("OK")) {
+            System.out.println("You clicked OK");
+            ((Stage) mainVBox.getScene().getWindow()).close();
+        } else {}
     }
 
     public void btnRename(ActionEvent actionEvent) {
         System.out.println("Rename");
+        if (pathView.getSelectionModel().isEmpty()) {
+            new Alert(Alert.AlertType.ERROR, "No File or Folder selected", ButtonType.OK, ButtonType.CANCEL).showAndWait();
+            return;
+        }
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.showAndWait();
+        String fileName = dialog.getResult();
+        if (fileName == null || fileName.contains(".")) {
+            new Alert(Alert.AlertType.ERROR, "New File Name must contain Chars and Numbers", ButtonType.OK, ButtonType.CANCEL).showAndWait();
+            return;
+        } else {
+            String path = getItemPath(pathView.getSelectionModel().getSelectedItem());
+            String path2 = null;
+            if(pathView.getSelectionModel().getSelectedItem().getValue().isDirectory()) {
+                path2 = getItemPath(pathView.getSelectionModel().getSelectedItem().getParent()) + "\\" + fileName;
+            } else {
+                path2 = getItemPath(pathView.getSelectionModel().getSelectedItem().getParent()) + "\\" + fileName + path.substring(path.indexOf("."));
+            }
+            System.out.println(path + " " + path2);
+            Network.getInstance().addToQueue(new CmdMessage(path+"=>"+path2, CmdMessage.CmdType.RENAME));
+        }
     }
 
     public void setTreeRoot(TreeItem<FileStats> root) {

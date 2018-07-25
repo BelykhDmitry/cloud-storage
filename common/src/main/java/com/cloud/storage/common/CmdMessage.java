@@ -11,7 +11,8 @@ public class CmdMessage extends AbstractMessage {
         REMOVE_FILE,
         GET_PATHS_LIST, // TODO: Реализация передачи мета-информации о хранилище
         GET_FOLDER, //Продумать реализацию. Через List файлов?
-        CHANGE_PASS
+        CHANGE_PASS,
+        RENAME
     }
 
     private CmdType cmdType;
