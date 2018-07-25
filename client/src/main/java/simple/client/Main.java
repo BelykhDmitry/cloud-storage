@@ -31,36 +31,36 @@ public class Main {
 //        }
     }
 
-    private static FilesMessage getFiles(String user, String filePath) throws IOException {
-        Path p = Paths.get(rootFolder + user + "\\" + filePath);
-        FilesMessage msg = new FilesMessage();
-        Files.walkFileTree(p, new FileVisitor<Path>() {
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                if(dir.compareTo(p) != 0) {
-                    msg.addToList(p.relativize(dir).toString(), attrs.isDirectory(), null, attrs.size());
-                }
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                msg.addToList(p.relativize(file).toString(), attrs.isDirectory(), null, attrs.size());
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-                return FileVisitResult.TERMINATE;
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                return FileVisitResult.CONTINUE;
-            }
-        });
-        return msg;
-    }
+//    private static FilesMessage getFiles(String user, String filePath) throws IOException {
+//        Path p = Paths.get(rootFolder + user + "\\" + filePath);
+//        FilesMessage msg = new FilesMessage();
+//        Files.walkFileTree(p, new FileVisitor<Path>() {
+//            @Override
+//            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+//                if(dir.compareTo(p) != 0) {
+//                    msg.addToList(p.relativize(dir).toString(), attrs.isDirectory(), null, attrs.size());
+//                }
+//                return FileVisitResult.CONTINUE;
+//            }
+//
+//            @Override
+//            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+//                msg.addToList(p.relativize(file).toString(), attrs.isDirectory(), null, attrs.size());
+//                return FileVisitResult.CONTINUE;
+//            }
+//
+//            @Override
+//            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+//                return FileVisitResult.TERMINATE;
+//            }
+//
+//            @Override
+//            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+//                return FileVisitResult.CONTINUE;
+//            }
+//        });
+//        return msg;
+//    }
 
     private static void client() {
         int j = 1;

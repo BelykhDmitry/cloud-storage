@@ -1,24 +1,24 @@
 package com.cloud.storage.common;
 
+import javafx.scene.control.TreeItem;
+import jdk.internal.util.xml.XMLStreamException;
+import jdk.internal.util.xml.impl.XMLWriter;
+import sun.reflect.generics.tree.Tree;
+
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FilesMessage extends AbstractMessage {
-    private List<FileMessage> list;
+    private String XML;
 
-    public FilesMessage() {
-        this.list = new ArrayList<>();
+    public FilesMessage(String XML) {
+        this.XML = XML;
     }
 
-    public List<FileMessage> getList() {
-        return list;
-    } // return Stream?
-
-    public void addToList(FileMessage msg) {
-        list.add(msg);
-    }
-
-    public void addToList(String fileRelativePathName, boolean isDirectory, byte[] data, long size) {
-        list.add(new FileMessage(fileRelativePathName, isDirectory, data, size));
+    public String getXML() {
+        return XML;
     }
 }

@@ -56,7 +56,6 @@ public class AuthController implements Initializable, InputListener {
         System.out.println(login.getText() + " " + password.getText());
         if (Network.getInstance().getStatus())
             Network.getInstance().addToQueue(new AuthMessage(login.getText(), password.getText(), registration.isSelected()));
-        AbstractMessage msg;
         while(!serverCallBack) {}
         if (authorized) {
             changeScreen();

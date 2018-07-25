@@ -1,5 +1,6 @@
 package com.cloud.storage.client;
 
+import com.cloud.storage.common.CmdMessage;
 import com.cloud.storage.common.FileMessage;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -24,32 +25,33 @@ public class MainWindowController implements Initializable {
     VBox mainVBox;
 
     @FXML
-    TreeTableView<FileMessage> pathView;
+    TreeTableView<FileStats> pathView;
 
-    MessageController messageController;
+    volatile TreeItem<FileStats> root;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("Init");
         initPathView();
-        messageController = new MessageController();
-        //Network.getInstance().addListener(messageController); // Как узнать, когда окно закрывается? Чтобы отписаться от рыссылки. Возможно стоит подписываться и отписываться когда сообщение ожидается
+        MessageController messageController = new MessageController(this);
+        Network.getInstance().addListener(messageController); // Как узнать, когда окно закрывается? Чтобы отписаться от рыссылки. Возможно стоит подписываться и отписываться когда сообщение ожидается
+        Network.getInstance().addToQueue(new CmdMessage("", CmdMessage.CmdType.GET_PATHS_LIST));
     }
 
     private void initPathView() {
         //Запрос на сервак
-        FileMessage msg = new FileMessage("/", true, null, 0);
-        TreeItem<FileMessage> root = new TreeItem<>(msg);
+        FileStats msg = new FileStats("/", true, Integer.toString(0));
+        root = new TreeItem<>(msg);
         pathView.setRoot(root);
         pathView.setShowRoot(false);
-        TreeTableColumn<FileMessage, String> nameColumn = new TreeTableColumn<>("Name");
-        TreeTableColumn<FileMessage, Boolean> isDirectoryColumn = new TreeTableColumn<>("Is Directory");
-        TreeTableColumn<FileMessage, String> sizeColumn = new TreeTableColumn<>("Size");
+        TreeTableColumn<FileStats, String> nameColumn = new TreeTableColumn<>("Name");
+        //TreeTableColumn<FileMessage, Boolean> isDirectoryColumn = new TreeTableColumn<>("Is Directory");
+        TreeTableColumn<FileStats, String> sizeColumn = new TreeTableColumn<>("Size");
         nameColumn.setEditable(true);
         nameColumn.setCellValueFactory(param -> param.getValue().getValue().getRelativeNameProperty());
-        isDirectoryColumn.setCellValueFactory(param -> param.getValue().getValue().getIsDirectoryProperty());
+        //isDirectoryColumn.setCellValueFactory(param -> param.getValue().getValue().getIsDirectoryProperty());
         sizeColumn.setCellValueFactory(param -> param.getValue().getValue().getSizeProperty());
-        pathView.getColumns().setAll(nameColumn, isDirectoryColumn, sizeColumn);
+        pathView.getColumns().setAll(nameColumn, sizeColumn);
         pathView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     }
 
@@ -66,28 +68,28 @@ public class MainWindowController implements Initializable {
 
         System.out.println("Add File");
         if (pathView.getSelectionModel().isEmpty()) {
-            pathView.getRoot().getChildren().add(new TreeItem<>(new FileMessage("New File", false, null, (long)(Math.random()*1000))));
+            pathView.getRoot().getChildren().add(new TreeItem<>(new FileStats("New File", false, Double.toString(Math.random()*1000))));
         } else if (pathView.getSelectionModel().getSelectedItem().getValue().isDirectory()) {
-            pathView.getSelectionModel().getSelectedItem().getChildren().add(new TreeItem<>(new FileMessage("New File", false, null, (long)(Math.random()*1000))));
+            pathView.getSelectionModel().getSelectedItem().getChildren().add(new TreeItem<>(new FileStats("New File", false, Double.toString(Math.random()*1000))));
         } else {
-            pathView.getSelectionModel().getSelectedItem().getParent().getChildren().add(new TreeItem<>(new FileMessage("New File", false, null, (long)(Math.random()*1000))));
+            pathView.getSelectionModel().getSelectedItem().getParent().getChildren().add(new TreeItem<>(new FileStats("New File", false, Double.toString(Math.random()*1000))));
         }
     }
 
     public void btnAddFolder() {
         System.out.println("Add Folder");
         if (pathView.getSelectionModel().isEmpty()) {
-            pathView.getRoot().getChildren().add(new TreeItem<>(new FileMessage("New Folder", true, null, 0)));
+            pathView.getRoot().getChildren().add(new TreeItem<>(new FileStats("New Folder", true, Integer.toString(0))));
         } else if (pathView.getSelectionModel().getSelectedItem().getValue().isDirectory()) {
-            pathView.getSelectionModel().getSelectedItem().getChildren().add(new TreeItem<>(new FileMessage("New Folder", true, null, 0)));
+            pathView.getSelectionModel().getSelectedItem().getChildren().add(new TreeItem<>(new FileStats("New Folder", true, Integer.toString(0))));
         } else {
-            pathView.getSelectionModel().getSelectedItem().getParent().getChildren().add(new TreeItem<>(new FileMessage("New Folder", true, null, 0)));
+            pathView.getSelectionModel().getSelectedItem().getParent().getChildren().add(new TreeItem<>(new FileStats("New Folder", true, Integer.toString(0))));
         }
     }
 
     public void btnDownloadFile() {
         System.out.println("Download File");
-        System.out.println(pathView.getSelectionModel().getSelectedItem().getValue().getFileRelativePathName());
+        System.out.println(pathView.getSelectionModel().getSelectedItem().getValue().getRelativeNameProperty().toString());
 
     }
 
@@ -97,7 +99,13 @@ public class MainWindowController implements Initializable {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get().getText().equals("OK")) {
             System.out.println("You clicked OK");
-            pathView.getTreeItem(pathView.getSelectionModel().getFocusedIndex()).getParent().getChildren().remove(pathView.getSelectionModel().getSelectedItem());
+            String path = getItemPath(pathView.getSelectionModel().getSelectedItem());
+            if(pathView.getSelectionModel().getSelectedItem().getValue().isDirectory()) {
+                Network.getInstance().addToQueue(new CmdMessage(path, CmdMessage.CmdType.REMOVE_FOLDER));
+            } else {
+                Network.getInstance().addToQueue(new CmdMessage(path, CmdMessage.CmdType.REMOVE_FILE));
+            }
+            //pathView.getTreeItem(pathView.getSelectionModel().getFocusedIndex()).getParent().getChildren().remove(pathView.getSelectionModel().getSelectedItem());
         } else if (result.get().getText().equals("Cancel")) {
             System.out.println("You clicked Cancel");
         }
@@ -110,4 +118,18 @@ public class MainWindowController implements Initializable {
     public void btnRename(ActionEvent actionEvent) {
         System.out.println("Rename");
     }
+
+    public void setTreeRoot(TreeItem<FileStats> root) {
+        this.root = root;
+    }
+
+    public void btnRefresh() {this.pathView.setRoot(root); this.pathView.refresh();}
+
+    private String getItemPath(TreeItem<FileStats> item) {
+        String path = item.getValue().getRelativeNameProperty().get();
+        if(item.getParent() != null && item.getParent().getParent() != null) {
+            return getItemPath(item.getParent()) + "\\" + path;
+        } else return path;
+    }
+
 }

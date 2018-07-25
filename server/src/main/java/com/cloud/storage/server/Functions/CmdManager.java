@@ -1,6 +1,7 @@
 package com.cloud.storage.server.Functions;
 
 import com.cloud.storage.common.CmdMessage;
+import com.cloud.storage.common.FilesMessage;
 import com.cloud.storage.common.ServerCallbackMessage;
 import com.sun.istack.internal.NotNull;
 import io.netty.channel.ChannelHandlerContext;
@@ -30,7 +31,8 @@ public class CmdManager {
             switch (cmd.getCmdType()) {
                 case REMOVE_FOLDER: //CallBack: ServerCallbackMessage OK or FAIL
                     FileManager.getInstance().removeDir(user, cmd.getCmd());
-                    ServerCallBack.serverAnswer(ctx, ServerCallbackMessage.Answer.FAIL);
+                    ServerCallBack.serverAnswer(ctx, ServerCallbackMessage.Answer.OK);
+                    ServerCallBack.directoryTransfer(ctx, new FilesMessage(FileManager.getInstance().getXMLTree(user,"")));
                     break;
                 case GET_FILE: // TODO: Extra class for multi-file transfer or modification of FileMessage
                     ServerCallBack.fileTransfer(ctx, FileManager.getInstance().readFile(user, cmd.getCmd()));
@@ -41,11 +43,13 @@ public class CmdManager {
                     break;
                 case REMOVE_FILE: //CallBack: ServerCallbackMessage OK or FAIL
                     FileManager.getInstance().removeFile(user, cmd.getCmd());
-                    ServerCallBack.serverAnswer(ctx, ServerCallbackMessage.Answer.FAIL);
+                    ServerCallBack.serverAnswer(ctx, ServerCallbackMessage.Answer.OK);
+                    ServerCallBack.directoryTransfer(ctx, new FilesMessage(FileManager.getInstance().getXMLTree(user,"")));
                     break;
                 case GET_PATHS_LIST:
-                    //FileManager.getInstance().getFiles(user, "");
-                    ServerCallBack.directoryTransfer(ctx, FileManager.getInstance().getFiles(user, ""));
+                    System.out.println("Before transfer");
+                    ServerCallBack.directoryTransfer(ctx, new FilesMessage(FileManager.getInstance().getXMLTree(user,"")));
+                    System.out.println("After transfer " + ctx.channel().bytesBeforeWritable());
                     break;
                 case CHANGE_PASS:
                 default:throw new IOException("Неопознанная команда");

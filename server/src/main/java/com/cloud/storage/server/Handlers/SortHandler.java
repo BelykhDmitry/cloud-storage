@@ -27,10 +27,10 @@ public class SortHandler extends ChannelInboundHandlerAdapter {
             System.out.flush();
             if (msg instanceof CmdMessage) {
                 CmdManager.getInstance().processCmd(userName, (CmdMessage) msg, ctx);
-                System.out.println(((CmdMessage) msg).getCmd());
+                System.out.println(((CmdMessage) msg).getCmd() + " " + ((CmdMessage) msg).getCmdType());
                 System.out.flush();
-                ctx.write(new ServerCallbackMessage(ServerCallbackMessage.Answer.FAIL));
-                ctx.flush();
+                /*ctx.write(new ServerCallbackMessage(ServerCallbackMessage.Answer.FAIL));
+                ctx.flush();*/
             } else if (msg instanceof FileMessage) {
                 System.out.println(((FileMessage)msg).getFileRelativePathName() + ": " + ((FileMessage)msg).getData().length);
                 System.out.flush();

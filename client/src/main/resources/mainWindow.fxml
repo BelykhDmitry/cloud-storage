@@ -39,6 +39,11 @@
                     <Insets right="5.0"/>
                 </HBox.margin>
             </Button>
+            <Button text="Refresh" onAction="#btnRefresh">
+                <HBox.margin>
+                    <Insets right="5.0"/>
+                </HBox.margin>
+            </Button>
             <Button text="Exit" onAction="#btnExit"/>
         </HBox>
         <TreeTableView fx:id="pathView"/>

@@ -16,13 +16,13 @@ public  class  Network {
     public static volatile Network instance;
 
     private Socket sock;
-    private Queue<Serializable> outQueue;
-    private Queue<AbstractMessage> inQueue; //Целесообразность? Пока оставлю
+    private Queue<Serializable> outQueue;//Целесообразность? Пока оставлю
+    private Queue<AbstractMessage> inQueue;
     private ObjectEncoderOutputStream oeos;
     private ObjectDecoderInputStream odis;
     private Thread input;
     private Thread output;
-    private ArrayList<InputListener> listeners;
+    private volatile ArrayList<InputListener> listeners;
     private Semaphore smp = new Semaphore(1);
 
     private Network() {
@@ -69,12 +69,14 @@ public  class  Network {
         input = new Thread(() -> {
             try {
                 while(!Thread.currentThread().isInterrupted()) {
+                    //System.out.println("Available " + odis.available());
                     if(odis.available() > 0) {
                         inQueue.add((AbstractMessage) odis.readObject());
                     }
                     if(inQueue.size() > 0) {  // Оставить здесь? Продумать механизм защиты в случае прерывания, чтобы не было потери сообщений
                         fireListeners(inQueue.poll());
                     }
+                    Thread.sleep(500);
                 }
                 throw new InterruptedException();
             } catch (ClassNotFoundException e) {
@@ -123,11 +125,18 @@ public  class  Network {
 
     public void addListener(InputListener listener) {
         listeners.add(listener);
+        System.out.println("New Listener");
     }
 
     public void removeListener(InputListener listener) {
         listeners.remove(listener);
         listeners.trimToSize();
+        System.out.println("Listener removed");
+    }
+
+    public void removeAll() {
+        listeners.removeAll(listeners);
+        System.out.println(listeners.size());
     }
 
     private <T extends AbstractMessage> void fireListeners(T msg) {

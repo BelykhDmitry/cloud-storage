@@ -4,7 +4,9 @@ import com.cloud.storage.common.FileMessage;
 import com.cloud.storage.common.FilesMessage;
 import javafx.scene.control.TreeItem;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -26,7 +28,7 @@ public class FileManager {
         return localInstance;
     }
 
-    private final String rootFolder = "C:\\Users\\Dmitrii\\Cloud\\";  //TODO: Server Settings from File? (Root folder)
+    private final String rootFolder = "D:\\Dmitrii\\Cloud\\";  //TODO: Server Settings from File? (Root folder)
 
     //public void setPath(String path) {this.rootFolder = path;}
 
@@ -91,34 +93,86 @@ public class FileManager {
         Files.delete(Paths.get(rootFolder + user + "\\" + filePath));
     }
 
-    public FilesMessage getFiles(String user, String filePath) throws IOException {
+    public String getXMLTree(String user, String filePath) {
         Path p = Paths.get(rootFolder + user + "\\" + filePath);
-        FilesMessage msg = new FilesMessage();
-        Files.walkFileTree(p, new FileVisitor<Path>() {
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                if(dir.compareTo(p) != 0) {
-                    msg.addToList(p.relativize(dir).toString(), attrs.isDirectory(), null, attrs.size());
+        StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        try {
+            Files.walkFileTree(p, new FileVisitor<Path>() {
+                @Override
+                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                    strBuilder.append("<Dir name=\""  + dir.getFileName().toString() + "\">");
+                    return FileVisitResult.CONTINUE;
                 }
-                return FileVisitResult.CONTINUE;
-            }
 
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                msg.addToList(p.relativize(file).toString(), attrs.isDirectory(), null, attrs.size());
-                return FileVisitResult.CONTINUE;
-            }
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    strBuilder.append("<File name=\"" + file.getFileName().toString()+ "\" size=\""+ file.toFile().length() + "\">"+"</File>");
+                    return FileVisitResult.CONTINUE;
+                }
 
-            @Override
-            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-                return FileVisitResult.TERMINATE;
-            }
+                @Override
+                public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                    return FileVisitResult.CONTINUE;
+                }
 
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                return FileVisitResult.CONTINUE;
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    strBuilder.append("</Dir>");
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return strBuilder.toString();
+    }
+
+//    public FilesMessage getFiles(String user, String filePath) throws IOException {
+////        Path p = Paths.get(rootFolder + user + "\\" + filePath);
+////        FilesMessage msg = new FilesMessage();
+////        Files.walkFileTree(p, new FileVisitor<Path>() {
+////            @Override
+////            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+////                if(dir.compareTo(p) != 0) {
+////                    msg.addToList(p.relativize(dir).toString(), attrs.isDirectory(), null, attrs.size());
+////                }
+////                return FileVisitResult.CONTINUE;
+////            }
+////
+////            @Override
+////            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+////                msg.addToList(p.relativize(file).toString(), attrs.isDirectory(), null, attrs.size());
+////                return FileVisitResult.CONTINUE;
+////            }
+////
+////            @Override
+////            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+////                return FileVisitResult.TERMINATE;
+////            }
+////
+////            @Override
+////            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+////                return FileVisitResult.CONTINUE;
+////            }
+////        });
+////        return msg;
+////    }
+
+    public TreeItem<FileMessage> getUserTree(String user) {
+        return getDirTree(new File(rootFolder + user));
+    }
+
+    public TreeItem<FileMessage> getDirTree(File directory) {
+        TreeItem<FileMessage> root = new TreeItem<>(new FileMessage(directory.getName(),true, null, 0));
+        for(File f : directory.listFiles()) {
+            System.out.println("Loading " + f.getName());
+            if(f.isDirectory()) { //Then we call the function recursively
+                root.getChildren().add(getDirTree(f));
+            } else {
+                root.getChildren().add(new TreeItem<>(new FileMessage(f.getName(),false, null, f.length())));
             }
-        });
-        return msg;
+        }
+        return root;
     }
 }
