@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -92,7 +93,7 @@ public class MainWindowController implements Initializable {
         TextInputDialog dialog = new TextInputDialog();
         dialog.showAndWait();
         String folderName = dialog.getResult();
-        if (folderName == null) folderName = "New Folder";
+        if (folderName == null || folderName.contains(".") || !Files.exists(Paths.get(folderName))) folderName = "New Folder";
         System.out.println("Add Folder");
         if (pathView.getSelectionModel().isEmpty()) {
         } else if (pathView.getSelectionModel().getSelectedItem().getValue().isDirectory()) {
@@ -159,7 +160,9 @@ public class MainWindowController implements Initializable {
         TextInputDialog dialog = new TextInputDialog();
         dialog.showAndWait();
         String fileName = dialog.getResult();
-        if (fileName == null || fileName.contains(".")) {
+        System.out.println();
+        if (fileName == null || fileName.contains(".") || !Files.exists(Paths.get(fileName))) {
+
             new Alert(Alert.AlertType.ERROR, "New File Name must contain Chars and Numbers", ButtonType.OK, ButtonType.CANCEL).showAndWait();
             return;
         } else {
