@@ -40,7 +40,7 @@ public class FileManager {
     }
     public FileMessage readFile(String user, String fileRelativePath) throws IOException {
         Path p = Paths.get(rootFolder + user+ "\\" + fileRelativePath);
-        return new FileMessage(fileRelativePath, false, Files.readAllBytes(p), Files.size(p));
+        return new FileMessage(p.getFileName().toString(), false, Files.readAllBytes(p), Files.size(p));
     }
 
     public void makeDir(String user, String path) throws IOException {

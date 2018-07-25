@@ -12,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -32,12 +33,14 @@ public class MainWindowController implements Initializable {
 
     volatile TreeItem<FileStats> root;
 
+    MessageController msgController;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("Init");
         initPathView();
-        MessageController messageController = new MessageController(this);
-        Network.getInstance().addListener(messageController); // Как узнать, когда окно закрывается? Чтобы отписаться от рыссылки. Возможно стоит подписываться и отписываться когда сообщение ожидается
+        msgController = new MessageController(this);
+        Network.getInstance().addListener(msgController); // Как узнать, когда окно закрывается? Чтобы отписаться от рыссылки. Возможно стоит подписываться и отписываться когда сообщение ожидается
         Network.getInstance().addToQueue(new CmdMessage("", CmdMessage.CmdType.GET_PATHS_LIST));
     }
 
@@ -99,7 +102,21 @@ public class MainWindowController implements Initializable {
     public void btnDownloadFile() {
         System.out.println("Download File");
         System.out.println(pathView.getSelectionModel().getSelectedItem().getValue().getRelativeNameProperty().toString());
-
+        String relativeName = null;
+        if (pathView.getSelectionModel().isEmpty()) {
+            new Alert(Alert.AlertType.ERROR, "No File selected", ButtonType.OK, ButtonType.CANCEL).showAndWait();
+        } else if (pathView.getSelectionModel().getSelectedItem().getValue().isDirectory()) {
+            new Alert(Alert.AlertType.ERROR, "Selected Item is a Directory. Please, select File to Download", ButtonType.OK, ButtonType.CANCEL).showAndWait();
+        } else {
+            relativeName = getItemPath(pathView.getSelectionModel().getSelectedItem());
+            DirectoryChooser chooser = new DirectoryChooser();
+            File file = chooser.showDialog(mainVBox.getScene().getWindow());
+            if(file == null) {
+                return;
+            }
+            msgController.setFileSavePath(file.getAbsolutePath());
+            Network.getInstance().addToQueue(new CmdMessage(relativeName, CmdMessage.CmdType.GET_FILE));
+        }
     }
 
     public void btnDeleteFile() {
@@ -114,7 +131,6 @@ public class MainWindowController implements Initializable {
             } else {
                 Network.getInstance().addToQueue(new CmdMessage(path, CmdMessage.CmdType.REMOVE_FILE));
             }
-            //pathView.getTreeItem(pathView.getSelectionModel().getFocusedIndex()).getParent().getChildren().remove(pathView.getSelectionModel().getSelectedItem());
         } else if (result.get().getText().equals("Cancel")) {
             System.out.println("You clicked Cancel");
         }

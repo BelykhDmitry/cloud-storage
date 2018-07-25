@@ -38,13 +38,9 @@ public class CmdManager {
                     ServerCallBack.fileTransfer(ctx, FileManager.getInstance().readFile(user, cmd.getCmd()));
                     break;
                 case CREATE_FOLDER: //CallBack: ServerCallbackMessage OK or FAIL
-                    try {
-                        FileManager.getInstance().makeDir(user, cmd.getCmd());
-                        ServerCallBack.serverAnswer(ctx, ServerCallbackMessage.Answer.OK);
-                        ServerCallBack.directoryTransfer(ctx, new FilesMessage(FileManager.getInstance().getXMLTree(user,"")));
-                    } catch (IOException e) {
-                        ServerCallBack.serverAnswer(ctx, ServerCallbackMessage.Answer.FAIL);
-                    }
+                    FileManager.getInstance().makeDir(user, cmd.getCmd());
+                    ServerCallBack.serverAnswer(ctx, ServerCallbackMessage.Answer.OK);
+                    ServerCallBack.directoryTransfer(ctx, new FilesMessage(FileManager.getInstance().getXMLTree(user,"")));
                     break;
                 case REMOVE_FILE: //CallBack: ServerCallbackMessage OK or FAIL
                     FileManager.getInstance().removeFile(user, cmd.getCmd());
