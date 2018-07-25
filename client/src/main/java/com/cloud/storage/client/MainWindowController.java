@@ -2,6 +2,7 @@ package com.cloud.storage.client;
 
 import com.cloud.storage.common.CmdMessage;
 import com.cloud.storage.common.FileMessage;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -180,6 +181,7 @@ public class MainWindowController implements Initializable {
 
     public void setTreeRoot(TreeItem<FileStats> root) {
         this.root = root;
+        Platform.runLater(this::btnRefresh);
     }
 
     public void btnRefresh() {this.pathView.setRoot(root); this.pathView.refresh();}
