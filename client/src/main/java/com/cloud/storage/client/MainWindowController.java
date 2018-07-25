@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -57,8 +58,18 @@ public class MainWindowController implements Initializable {
         nameColumn.setCellValueFactory(param -> param.getValue().getValue().getRelativeNameProperty());
         //isDirectoryColumn.setCellValueFactory(param -> param.getValue().getValue().getIsDirectoryProperty());
         sizeColumn.setCellValueFactory(param -> param.getValue().getValue().getSizeProperty());
+        nameColumn.setMinWidth(300);
+        sizeColumn.setMinWidth(100);
         pathView.getColumns().setAll(nameColumn, sizeColumn);
         pathView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        pathView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if(event.getClickCount() == 2) {
+                    btnDownloadFile();
+                }
+            }
+        });
     }
 
     public void btnAddFile() {
