@@ -79,35 +79,21 @@ public class MainWindowController implements Initializable {
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
-//        Parent root = null;
-//        try {
-//            root = FXMLLoader.load(getClass().getResource("/fileBrowser.fxml"));
-//            Stage stage = new Stage();
-//            stage.setScene(new Scene(root, 600, 400));
-//            stage.showAndWait();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-//        System.out.println("Add File");
-//        if (pathView.getSelectionModel().isEmpty()) {
-//            pathView.getRoot().getChildren().add(new TreeItem<>(new FileStats("New File", false, Double.toString(Math.random()*1000))));
-//        } else if (pathView.getSelectionModel().getSelectedItem().getValue().isDirectory()) {
-//            pathView.getSelectionModel().getSelectedItem().getChildren().add(new TreeItem<>(new FileStats("New File", false, Double.toString(Math.random()*1000))));
-//        } else {
-//            pathView.getSelectionModel().getSelectedItem().getParent().getChildren().add(new TreeItem<>(new FileStats("New File", false, Double.toString(Math.random()*1000))));
-//        }
     }
 
     public void btnAddFolder() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.showAndWait();
+        String folderName = dialog.getResult();
+        if (folderName == null) folderName = "New Folder";
         System.out.println("Add Folder");
         if (pathView.getSelectionModel().isEmpty()) {
-            pathView.getRoot().getChildren().add(new TreeItem<>(new FileStats("New Folder", true, Integer.toString(0))));
         } else if (pathView.getSelectionModel().getSelectedItem().getValue().isDirectory()) {
-            pathView.getSelectionModel().getSelectedItem().getChildren().add(new TreeItem<>(new FileStats("New Folder", true, Integer.toString(0))));
+            folderName = getItemPath(pathView.getSelectionModel().getSelectedItem()) + "\\" + folderName;
         } else {
-            pathView.getSelectionModel().getSelectedItem().getParent().getChildren().add(new TreeItem<>(new FileStats("New Folder", true, Integer.toString(0))));
+            folderName = getItemPath(pathView.getSelectionModel().getSelectedItem().getParent()) + "\\" + folderName;
         }
+        Network.getInstance().addToQueue(new CmdMessage(folderName, CmdMessage.CmdType.CREATE_FOLDER));
     }
 
     public void btnDownloadFile() {

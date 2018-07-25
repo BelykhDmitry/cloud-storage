@@ -25,7 +25,7 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
                 AuthMessage auth = (AuthMessage) msg;
                 if (auth.isRegistration()) {
                     if(Authorization.getInstance().register(auth)) {
-                        System.out.println(FileManager.getInstance().makeDir(auth.getName(),""));
+                        FileManager.getInstance().makeDir(auth.getName(),"");
                         authOk(ctx, auth.getName());
                     } else {
                         failAnswer(ctx);

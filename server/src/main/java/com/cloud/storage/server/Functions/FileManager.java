@@ -43,15 +43,8 @@ public class FileManager {
         return new FileMessage(fileRelativePath, false, Files.readAllBytes(p), Files.size(p));
     }
 
-    public boolean makeDir(String user, String path) {
-        boolean result = false;
-        try {
-            Files.createDirectories(Paths.get(rootFolder + user + "\\" + path));
-            result = true;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return result;
+    public void makeDir(String user, String path) throws IOException {
+        Files.createDirectories(Paths.get(rootFolder + user + "\\" + path));
     }
 
     public void removeDir(String user, String dirPath) throws IOException { //TODO: Проверять на пустую строку и на наличие ../
