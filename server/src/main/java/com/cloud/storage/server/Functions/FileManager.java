@@ -28,12 +28,12 @@ public class FileManager {
         return localInstance;
     }
 
-    private final String rootFolder = "D:\\Dmitrii\\Cloud\\";  //TODO: Server Settings from File? (Root folder)
+    private final String rootFolder = "D:\\Dmitrii\\Cloud\\";  //TODO: Server Settings from File
 
     //public void setPath(String path) {this.rootFolder = path;}
 
-    public void writeFile(String user, FileMessage msg) throws IOException { // TODO: Продумать, как лучше создавать поддиректории. Склоняюсь к отдельному запросу - не должно сильно загрузить сеть
-        String path = rootFolder + user + "\\" + msg.getFileRelativePathName(); // FIXME: Проверка поддиректорий
+    public void writeFile(String user, FileMessage msg) throws IOException {
+        String path = rootFolder + user + "\\" + msg.getFileRelativePathName();
         System.out.println("Received from " + user + ": " + msg.getFileRelativePathName() + " " + msg.getChecksum() + ":" + msg.checkSum());
         //Files.createDirectories(Paths.get(path).getRoot());
         Files.write(Paths.get(path), msg.getData());
@@ -47,7 +47,7 @@ public class FileManager {
         Files.createDirectories(Paths.get(rootFolder + user + "\\" + path));
     }
 
-    public void removeDir(String user, String dirPath) throws IOException { //TODO: Проверять на пустую строку и на наличие ../
+    public void removeDir(String user, String dirPath) throws IOException {
         if (dirPath.equals("") || dirPath.contains(".."))
             throw new IOException("Попытка удалить корневой каталог пользователя " + user);
         Path path = Paths.get(rootFolder + user + "\\" + dirPath);
