@@ -10,7 +10,8 @@ public class ServerCallbackMessage extends AbstractMessage {
 
     public enum Answer {
         OK,
-        FAIL
+        FAIL,
+        DISCONNECTED
     }
     private Answer answer;
 

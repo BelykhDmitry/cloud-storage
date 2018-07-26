@@ -3,29 +3,19 @@ package com.cloud.storage.client;
 import com.cloud.storage.common.CmdMessage;
 import com.cloud.storage.common.FileMessage;
 import javafx.application.Platform;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Comparator;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -56,7 +46,7 @@ public class MainWindowController implements Initializable {
         pathView.setRoot(root);
         pathView.setShowRoot(false);
         TreeTableColumn<FileStats, String> nameColumn = new TreeTableColumn<>("Name");
-        TreeTableColumn<FileStats, String> sizeColumn = new TreeTableColumn<>("Size");
+        TreeTableColumn<FileStats, String> sizeColumn = new TreeTableColumn<>("Size, bytes");
         nameColumn.setCellValueFactory(param -> param.getValue().getValue().getRelativeNameProperty());
         sizeColumn.setCellValueFactory(param -> param.getValue().getValue().getSizeProperty());
         sizeColumn.setComparator((o1, o2) -> (int) (Long.parseLong(o1) - Long.parseLong(o2)));
@@ -98,14 +88,17 @@ public class MainWindowController implements Initializable {
         TextInputDialog dialog = new TextInputDialog();
         dialog.showAndWait();
         String folderName = dialog.getResult();
-        if (folderName == null || folderName.contains(".") || !Files.exists(Paths.get(folderName))) folderName = "New Folder";
+        if (!folderName.matches("[a-zA-Zа-яА-Я0-9]+")) folderName = "New Folder"; // TODO: Заглушка
         System.out.println("Add Folder");
         if (pathView.getSelectionModel().isEmpty()) {
         } else if (pathView.getSelectionModel().getSelectedItem().getValue().isDirectory()) {
             folderName = getItemPath(pathView.getSelectionModel().getSelectedItem()) + "\\" + folderName;
         } else {
-            folderName = getItemPath(pathView.getSelectionModel().getSelectedItem().getParent()) + "\\" + folderName;
+            if(pathView.getSelectionModel().getSelectedItem().getParent().getParent() != null) {
+                folderName = getItemPath(pathView.getSelectionModel().getSelectedItem().getParent()) + "\\" + folderName;
+            }
         }
+        System.out.println(folderName);
         Network.getInstance().addToQueue(new CmdMessage(folderName, CmdMessage.CmdType.CREATE_FOLDER));
     }
 
@@ -165,21 +158,27 @@ public class MainWindowController implements Initializable {
         TextInputDialog dialog = new TextInputDialog();
         dialog.showAndWait();
         String fileName = dialog.getResult();
-        System.out.println();
-        if (fileName == null || fileName.contains(".") || !Files.exists(Paths.get(fileName))) {
-
+        if (fileName == null || !fileName.matches("[a-zA-Zа-яА-Я0-9]+")) {
             new Alert(Alert.AlertType.ERROR, "New File Name must contain Chars and Numbers", ButtonType.OK, ButtonType.CANCEL).showAndWait();
             return;
         } else {
             String path = getItemPath(pathView.getSelectionModel().getSelectedItem());
-            String path2 = null;
-            if(pathView.getSelectionModel().getSelectedItem().getValue().isDirectory()) {
-                path2 = getItemPath(pathView.getSelectionModel().getSelectedItem().getParent()) + "\\" + fileName;
+            String path2;
+            if (pathView.getSelectionModel().getSelectedItem().getParent().getParent() == null) {
+                if (pathView.getSelectionModel().getSelectedItem().getValue().isDirectory()) {
+                    path2 = fileName;
+                } else {
+                    path2 = fileName + path.substring(path.indexOf("."));
+                }
             } else {
-                path2 = getItemPath(pathView.getSelectionModel().getSelectedItem().getParent()) + "\\" + fileName + path.substring(path.indexOf("."));
+                if (pathView.getSelectionModel().getSelectedItem().getValue().isDirectory()) {
+                    path2 = getItemPath(pathView.getSelectionModel().getSelectedItem().getParent()) + "\\" + fileName;
+                } else {
+                    path2 = getItemPath(pathView.getSelectionModel().getSelectedItem().getParent()) + "\\" + fileName + path.substring(path.indexOf("."));
+                }
             }
             System.out.println(path + " " + path2);
-            Network.getInstance().addToQueue(new CmdMessage(path+"=>"+path2, CmdMessage.CmdType.RENAME));
+            //Network.getInstance().addToQueue(new CmdMessage(path+"=>"+path2, CmdMessage.CmdType.RENAME));
         }
     }
 

@@ -2,6 +2,7 @@ package com.cloud.storage.server.Handlers;
 
 import com.cloud.storage.common.CmdMessage;
 import com.cloud.storage.common.FileMessage;
+import com.cloud.storage.common.Ping;
 import com.cloud.storage.common.ServerCallbackMessage;
 import com.cloud.storage.server.Functions.CmdManager;
 import com.cloud.storage.server.Functions.FileManager;
@@ -41,6 +42,8 @@ public class SortHandler extends ChannelInboundHandlerAdapter {
                 } catch (IOException e) {
                     ctx.write(new ServerCallbackMessage(ServerCallbackMessage.Answer.FAIL));
                 }
+            } else if (msg instanceof Ping) {
+                ctx.writeAndFlush(new Ping());
             } else {
                 System.out.println("Неопознанный тип сообщения");
             }

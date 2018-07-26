@@ -10,6 +10,10 @@ import java.io.IOException;
 import java.net.Socket;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class Main {
@@ -17,6 +21,42 @@ public class Main {
     private static String rootFolder = "C:\\Users\\Dmitrii\\Cloud\\";
 
     private static void run() {
+
+        Runnable task1 = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    while(true) {
+                        if(Thread.interrupted()) {
+                            Thread.currentThread().stop();
+                        }
+                        System.out.println("task1");
+                        Thread.sleep(100);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        Runnable task2 = new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("task2");
+            }
+        };
+
+        ExecutorService service = Executors.newFixedThreadPool(2);
+        service.submit(task1);
+        service.submit(task2);
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        service.shutdownNow();
+
+
         //new File("C:\\Users\\Dmitrii\\Desktop\\HW6.txt").renameTo(new File("C:\\Users\\Dmitrii\\Desktop\\HW7.txt"));
 //        Network net = new Network();
 //        try {

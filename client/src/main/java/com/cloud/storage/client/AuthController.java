@@ -15,15 +15,13 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import sun.nio.ch.Net;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class AuthController implements Initializable, InputListener {
-
-    private volatile boolean authorized = false;
-    private volatile boolean serverCallBack = false;
 
     @FXML
     VBox mainVBox;
@@ -45,37 +43,18 @@ public class AuthController implements Initializable, InputListener {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.println(location);
+        Network.getInstance().addListener(this);
         status.setEditable(false);
         status.setAlignment(Pos.CENTER);
-        if(!Network.getInstance().getStatus()) {
-            status.setText("Disconnected");
-            reg.setDisable(true);
-            Thread auth = new Thread(() -> {
-                while(!Network.getInstance().getStatus()) {
-                    try {
-                        String host = "localhost";
-                        int port = 8189;
-                        System.err.println("Подключение к " + host + ":" + port);
-                        Network.getInstance().connect(host, port);
-                        Thread.sleep(1000);
-                    } catch (IOException e) {
-                        System.err.println("Неудачная попытка подключения");
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                Platform.runLater(() -> {
-                    status.setText("Connected");
-                    status.setStyle("-fx-background-color:#40d660;-fx-text-fill:#000000");
-                    reg.setDisable(false);
-                });
-            });
-            auth.setDaemon(true);
-            auth.start();
-        } else {
+        status.setStyle("-fx-background-color:#f20c0f;-fx-text-fill:#ffffff");
+        reg.setDisable(true);
+        if(Network.getInstance().getStatus()) {
             status.setText("Connected");
             status.setStyle("-fx-background-color:#40d660;-fx-text-fill:#000000");
+            reg.setDisable(false);
+        } else {
+            new Thread(this::disconnected).start();
+            //Platform.runLater(() -> disconnected());
         }
     }
 
@@ -85,34 +64,53 @@ public class AuthController implements Initializable, InputListener {
             root = FXMLLoader.load(getClass().getResource("/mainWindow.fxml"));
             Stage stage = (Stage) mainVBox.getScene().getWindow();
             stage.setScene(new Scene(root, 600, 400));
+            Network.getInstance().removeListener(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public void auth() {
-        serverCallBack = false;
-        authorized = false;
-        Network.getInstance().addListener(this);
         System.out.println(login.getText() + " " + password.getText());
-        if (Network.getInstance().getStatus())
+        if (Network.getInstance().getStatus()) {
             Network.getInstance().addToQueue(new AuthMessage(login.getText(), password.getText(), registration.isSelected()));
-        while(!serverCallBack) {}
-        if (authorized) {
-            changeScreen();
         } else {
-            new Alert(Alert.AlertType.ERROR, "Wrong username or password", ButtonType.OK, ButtonType.CANCEL).showAndWait();
+            disconnected();
         }
-        Network.getInstance().removeListener(this);
+    }
+
+    public void connected() {
+        status.setText("Connected");
+        status.setStyle("-fx-background-color:#40d660;-fx-text-fill:#000000");
+        reg.setDisable(false);
+    }
+
+    public void disconnected() {
+        status.setText("Disconnected");
+        status.setStyle("-fx-background-color:#f20c0f;-fx-text-fill:#ffffff");
+        reg.setDisable(true);
+        try {
+            //Network.getInstance().disconnectt();
+            while (!Network.getInstance().getStatus()) {
+                new Thread(() -> Network.getInstance().connectt()).start();
+                Thread.sleep(1000);
+            }
+            connected();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public <T extends AbstractMessage> void onMsgReceived(T msg) {
         if (msg instanceof ServerCallbackMessage) {
-            if (((ServerCallbackMessage) msg).getStatus() == ServerCallbackMessage.Answer.OK) {
-                authorized = true;
-            }
-            serverCallBack = true;
+            Platform.runLater(() -> {
+                if (((ServerCallbackMessage) msg).getStatus() == ServerCallbackMessage.Answer.OK) {
+                    changeScreen();
+                } else if (((ServerCallbackMessage) msg).getStatus() == ServerCallbackMessage.Answer.FAIL){
+                    new Alert(Alert.AlertType.ERROR, "Wrong username or password", ButtonType.OK, ButtonType.CANCEL).showAndWait();
+                }
+            });
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.cloud.storage.server.Handlers;
 
 import com.cloud.storage.common.AuthMessage;
+import com.cloud.storage.common.Ping;
 import com.cloud.storage.common.ServerCallbackMessage;
 import com.cloud.storage.server.Functions.Authorization;
 import com.cloud.storage.server.Functions.FileManager;
@@ -38,6 +39,8 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
                         return;
                     }
                 }
+            } else if (msg instanceof Ping) {
+                ctx.writeAndFlush(new Ping());
             } else {
                 System.out.println("Wrong auth object, return: " + System.currentTimeMillis());
                 return;
