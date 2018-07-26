@@ -1,0 +1,4 @@
+#Server parameters
+#Thu Jul 26 10:57:37 MSK 2018
+port=8189
+host=localhost

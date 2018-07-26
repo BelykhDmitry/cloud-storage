@@ -8,6 +8,12 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Properties;
+
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -21,12 +27,34 @@ public class Main extends Application {
     @Override
     public void init() throws Exception {
         super.init();
-        Network.getInstance().connect("localhost", 8189);
+        Properties prop = new Properties();
+        String host = null;
+        int port;
+        try {
+            prop.load(new FileInputStream("/prop.dtd"));
+            host = prop.getProperty("host");
+            port = Integer.parseInt(prop.getProperty("port"));
+        } catch (IOException | NullPointerException e) {
+            e.printStackTrace();
+            System.err.println("Не найден файл настроек/файл настроек неполный");
+            host = "localhost";
+            port = 8189;
+        }
+        try {
+            Network.getInstance().connect(host, port);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Не удалось подключиться к серверу");
+        }
     }
 
     @Override
     public void stop() throws Exception {
         Network.getInstance().disconnect();
+//        Properties prop = new Properties();
+//        prop.setProperty("host", "localhost");
+//        prop.setProperty("port", "8189");
+//        prop.store(new BufferedOutputStream(new FileOutputStream("prop.dtd")), "Server parameters");
         super.stop();
     }
 

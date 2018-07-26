@@ -3,6 +3,7 @@ package com.cloud.storage.client;
 import com.cloud.storage.common.CmdMessage;
 import com.cloud.storage.common.FileMessage;
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -17,12 +18,14 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -56,6 +59,7 @@ public class MainWindowController implements Initializable {
         TreeTableColumn<FileStats, String> sizeColumn = new TreeTableColumn<>("Size");
         nameColumn.setCellValueFactory(param -> param.getValue().getValue().getRelativeNameProperty());
         sizeColumn.setCellValueFactory(param -> param.getValue().getValue().getSizeProperty());
+        sizeColumn.setComparator((o1, o2) -> (int) (Long.parseLong(o1) - Long.parseLong(o2)));
         nameColumn.setMinWidth(300);
         sizeColumn.setMinWidth(100);
         pathView.getColumns().setAll(nameColumn, sizeColumn);
@@ -72,7 +76,7 @@ public class MainWindowController implements Initializable {
         try {
             File file = chooser.showOpenDialog(mainVBox.getScene().getWindow());
             System.out.println(file.getName() + " " + file.length());
-            String relativeName = null;
+            String relativeName;
             if (pathView.getSelectionModel().isEmpty()) {
                 relativeName = file.getName();
             } else if (pathView.getSelectionModel().getSelectedItem().getValue().isDirectory()) {

@@ -28,7 +28,7 @@ public class FileManager {
         return localInstance;
     }
 
-    private final String rootFolder = "D:\\Dmitrii\\Cloud\\";  //TODO: Server Settings from File
+    private final String rootFolder = "C:\\Users\\Dmitrii\\Cloud\\";  //TODO: Server Settings from File
 
     //public void setPath(String path) {this.rootFolder = path;}
 

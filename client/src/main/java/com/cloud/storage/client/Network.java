@@ -15,11 +15,11 @@ public  class  Network {
 
     private static volatile Network instance;
 
-    private Socket sock;
+    private Socket sock = null;
     private Queue<Serializable> outQueue;//Целесообразность? Пока оставлю
     private Queue<AbstractMessage> inQueue;
-    private ObjectEncoderOutputStream oeos;
-    private ObjectDecoderInputStream odis;
+    private ObjectEncoderOutputStream oeos = null;
+    private ObjectDecoderInputStream odis = null;
     private Thread input;
     private Thread output;
     private volatile ArrayList<InputListener> listeners;
@@ -42,79 +42,85 @@ public  class  Network {
         sock = new Socket(host, port);
         oeos = new ObjectEncoderOutputStream(sock.getOutputStream());
         odis = new ObjectDecoderInputStream(sock.getInputStream());
-        output = new Thread(() -> {
-            try {
-                while(!Thread.currentThread().isInterrupted()) {
-                    try {
-                        if (outQueue.size() > 0) {
-                            oeos.writeObject(outQueue.poll());
-                            oeos.flush();
+        if(getStatus()) {
+            output = new Thread(() -> {
+                try {
+                    while (!Thread.currentThread().isInterrupted()) {
+                        try {
+                            if (outQueue.size() > 0) {
+                                oeos.writeObject(outQueue.poll());
+                                oeos.flush();
+                            }
+                            Thread.sleep(500);
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                        Thread.sleep(500);
-                    } catch (IOException e) {
+                    }
+                    throw new InterruptedException();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        oeos.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    } catch (NullPointerException e) {
                         e.printStackTrace();
                     }
                 }
-                throw new InterruptedException();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } finally {
+            });
+            input = new Thread(() -> {
                 try {
-                    oeos.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                } catch (NullPointerException e) {
+                    while (!Thread.currentThread().isInterrupted()) {
+                        try {
+                            if (odis.available() > 0) {
+                                inQueue.add((AbstractMessage) odis.readObject());
+                            }
+                            if (inQueue.size() > 0) {
+                                fireListeners(inQueue.poll());
+                            }
+                            Thread.sleep(500);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    throw new InterruptedException();
+                } catch (ClassNotFoundException e) {
                     e.printStackTrace();
-                }
-            }
-        });
-        input = new Thread(() -> {
-            try {
-                while(!Thread.currentThread().isInterrupted()) {
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } finally {
                     try {
-                        if (odis.available() > 0) {
-                            inQueue.add((AbstractMessage) odis.readObject());
-                        }
-                        if (inQueue.size() > 0) {
-                            fireListeners(inQueue.poll());
-                        }
-                        Thread.sleep(500);
-                    } catch (IOException e) {
+                        odis.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    } catch (NullPointerException e) {
                         e.printStackTrace();
                     }
                 }
-                throw new InterruptedException();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    odis.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                } catch (NullPointerException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        output.setDaemon(true);
-        input.setDaemon(true);
-        output.start();
-        input.start();
-        System.out.println("Connected");
+            });
+            output.setDaemon(true);
+            input.setDaemon(true);
+            output.start();
+            input.start();
+            System.out.println("Connected");
+        } else {
+            System.err.println("Неудачная попытка подключения");
+        }
     }
 
     public void disconnect() throws IOException {
-        input.interrupt();
-        output.interrupt();
         try {
+            input.interrupt();
+            output.interrupt();
             input.join(10000);
             output.join(10000);
+            sock.close();
+        }catch (NullPointerException e) {
+            e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        sock.close();
         System.out.println("Disconnected");
     }
 
@@ -151,6 +157,6 @@ public  class  Network {
     }
 
     public boolean getStatus() {
-        return sock != null;
+        return (sock != null && oeos != null && odis != null);
     }
 }

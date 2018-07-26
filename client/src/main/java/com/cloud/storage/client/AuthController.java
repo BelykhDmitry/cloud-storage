@@ -3,14 +3,18 @@ package com.cloud.storage.client;
 import com.cloud.storage.common.AbstractMessage;
 import com.cloud.storage.common.AuthMessage;
 import com.cloud.storage.common.ServerCallbackMessage;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.io.IOException;
 import java.net.URL;
@@ -33,9 +37,46 @@ public class AuthController implements Initializable, InputListener {
     @FXML
     CheckBox registration;
 
+    @FXML
+    TextField status;
+
+    @FXML
+    Button reg;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println(location);
+        status.setEditable(false);
+        status.setAlignment(Pos.CENTER);
+        if(!Network.getInstance().getStatus()) {
+            status.setText("Disconnected");
+            reg.setDisable(true);
+            Thread auth = new Thread(() -> {
+                while(!Network.getInstance().getStatus()) {
+                    try {
+                        String host = "localhost";
+                        int port = 8189;
+                        System.err.println("Подключение к " + host + ":" + port);
+                        Network.getInstance().connect(host, port);
+                        Thread.sleep(1000);
+                    } catch (IOException e) {
+                        System.err.println("Неудачная попытка подключения");
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                Platform.runLater(() -> {
+                    status.setText("Connected");
+                    status.setStyle("-fx-background-color:#40d660;-fx-text-fill:#000000");
+                    reg.setDisable(false);
+                });
+            });
+            auth.setDaemon(true);
+            auth.start();
+        } else {
+            status.setText("Connected");
+            status.setStyle("-fx-background-color:#40d660;-fx-text-fill:#000000");
+        }
     }
 
     private void changeScreen() {
