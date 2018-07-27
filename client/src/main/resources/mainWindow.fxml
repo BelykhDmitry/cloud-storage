@@ -48,6 +48,11 @@
                     <Insets right="5.0"/>
                 </HBox.margin>
             </Button>
+            <Button text="Disconnect" onAction="#btnDisconnect">
+                <HBox.margin>
+                    <Insets right="5.0"/>
+                </HBox.margin>
+            </Button>
             <Button text="Exit" onAction="#btnExit"/>
         </HBox>
         <TreeTableView fx:id="pathView">

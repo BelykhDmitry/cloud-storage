@@ -3,6 +3,7 @@ package com.cloud.storage.client;
 import com.cloud.storage.common.CmdMessage;
 import com.cloud.storage.common.FileMessage;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -201,6 +202,24 @@ public class MainWindowController implements Initializable {
 
     public void serverDisconnected() {
         new Alert(Alert.AlertType.ERROR, "Server disconnected :(", ButtonType.OK, ButtonType.CANCEL).showAndWait();
+        changeScreen();
+    }
+
+    public void btnDisconnect() {
+        Optional<ButtonType> result = new Alert(Alert.AlertType.CONFIRMATION, "You want to disconnect from server?", ButtonType.OK, ButtonType.CANCEL).showAndWait();
+        if (result.get().getText().equals("OK")) {
+            try {
+                Network.getInstance().removeListener(msgController);
+                Parent root = FXMLLoader.load(getClass().getResource("/auth.fxml"));
+                Stage stage = (Stage) mainVBox.getScene().getWindow();
+                stage.setScene(new Scene(root, 400, 400));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void changeScreen() {
         try {
             Network.getInstance().removeListener(msgController);
             Parent root = FXMLLoader.load(getClass().getResource("/auth.fxml"));
