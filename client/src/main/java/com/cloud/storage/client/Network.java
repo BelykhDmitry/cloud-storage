@@ -114,6 +114,7 @@ public  class  Network {
 
     public <T extends AbstractMessage> void addToQueue  (T msg) {
         this.outQueue.add(msg);
+        System.err.println("New Output message");
     }
 
     public void addListener(InputListener listener) {
@@ -180,11 +181,13 @@ public  class  Network {
     }
 
     public void disconnect() {
+        System.err.println("Try to close connection");
         try {
             oeos.close();
             odis.close();
             sock.close();
             rc = RC.ERROR;
+            System.err.println("Disconnected");
         } catch (IOException | NullPointerException e) {
             System.err.println(e.getMessage());
         }

@@ -42,6 +42,7 @@ public class MainWindowController implements Initializable {
         initPathView();
         msgController = new MessageController(this);
         Network.getInstance().addListener(msgController);
+        System.err.println("Initialize");
         Network.getInstance().addToQueue(new CmdMessage("", CmdMessage.CmdType.GET_PATHS_LIST));
     }
 
@@ -55,7 +56,7 @@ public class MainWindowController implements Initializable {
         nameColumn.setCellValueFactory(param -> param.getValue().getValue().getRelativeNameProperty());
         sizeColumn.setCellValueFactory(param -> param.getValue().getValue().getSizeProperty());
         sizeColumn.setComparator((o1, o2) -> (int) (Long.parseLong(o1) - Long.parseLong(o2)));
-        nameColumn.setMinWidth(300);
+        nameColumn.setMinWidth(400);
         sizeColumn.setMinWidth(100);
         pathView.getColumns().setAll(nameColumn, sizeColumn);
         pathView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
@@ -95,14 +96,14 @@ public class MainWindowController implements Initializable {
         String folderName = dialog.getResult();
         if (!folderName.matches("[a-zA-Zа-яА-Я0-9 ]+")) folderName = "New Folder"; // TODO: Заглушка
         System.out.println("Add Folder");
-        if (pathView.getSelectionModel().isEmpty()) {
-        } else if (pathView.getSelectionModel().getSelectedItem().getValue().isDirectory()) {
+        if (!pathView.getSelectionModel().isEmpty()) {
+            if (pathView.getSelectionModel().getSelectedItem().getValue().isDirectory()) {
             folderName = getItemPath(pathView.getSelectionModel().getSelectedItem()) + "\\" + folderName;
         } else {
             if(pathView.getSelectionModel().getSelectedItem().getParent().getParent() != null) {
                 folderName = getItemPath(pathView.getSelectionModel().getSelectedItem().getParent()) + "\\" + folderName;
             }
-        }
+        }}
         System.out.println(folderName);
         Network.getInstance().addToQueue(new CmdMessage(folderName, CmdMessage.CmdType.CREATE_FOLDER));
     }
@@ -189,10 +190,14 @@ public class MainWindowController implements Initializable {
 
     public void setTreeRoot(TreeItem<FileStats> root) {
         this.root = root;
-        Platform.runLater(this::btnRefresh);
+        Platform.runLater(() -> {
+            pathView.setRoot(root);
+            pathView.refresh();
+        });
     }
 
     public void btnRefresh() {
+        System.err.println("Refresh");
         Network.getInstance().addToQueue(new CmdMessage("", CmdMessage.CmdType.GET_PATHS_LIST));
         this.pathView.setRoot(root);
         this.pathView.refresh();
@@ -213,20 +218,15 @@ public class MainWindowController implements Initializable {
     public void btnDisconnect() {
         Optional<ButtonType> result = new Alert(Alert.AlertType.CONFIRMATION, "You want to disconnect from server?", ButtonType.OK, ButtonType.CANCEL).showAndWait();
         if (result.get().getText().equals("OK")) {
-            try {
-                Network.getInstance().removeListener(msgController);
-                Parent root = FXMLLoader.load(getClass().getResource("/auth.fxml"));
-                Stage stage = (Stage) mainVBox.getScene().getWindow();
-                stage.setScene(new Scene(root, 400, 400));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            changeScreen();
         }
     }
 
     private void changeScreen() {
         try {
             Network.getInstance().removeListener(msgController);
+            Network.getInstance().disconnect();
+            System.err.println("It was a try to disconnect");
             Parent root = FXMLLoader.load(getClass().getResource("/auth.fxml"));
             Stage stage = (Stage) mainVBox.getScene().getWindow();
             stage.setScene(new Scene(root, 400, 400));

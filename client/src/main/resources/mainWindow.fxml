@@ -10,6 +10,8 @@
 <StackPane xmlns="http://javafx.com/javafx"
            xmlns:fx="http://javafx.com/fxml"
            fx:controller="com.cloud.storage.client.MainWindowController"
+           stylesheets="style.css"
+           styleClass="background"
            prefHeight="400.0" prefWidth="600.0">
 
     <VBox fx:id="mainVBox">

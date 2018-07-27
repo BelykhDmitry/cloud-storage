@@ -11,6 +11,8 @@
       alignment="center"
       xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
+      stylesheets="style.css"
+      styleClass="background"
       fx:controller="com.cloud.storage.client.AuthController"
       prefHeight="400.0" prefWidth="600.0">
     <TextField fx:id="status" maxWidth="150" style="-fx-background-color:#f20c0f;-fx-text-fill:#ffffff">

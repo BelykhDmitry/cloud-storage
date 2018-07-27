@@ -49,20 +49,21 @@ public class AuthController implements Initializable, InputListener {
             login.setText(username);
         status.setEditable(false);
         status.setAlignment(Pos.CENTER);
-        status.setStyle("-fx-background-color:#f20c0f;-fx-text-fill:#ffffff");
+        status.setStyle("-fx-background-color:#f20c0f;-fx-text-fill:#ffffff;-fx-border-color: #1d1d1d;-fx-border-radius:4;");
         reg.setDisable(true);
         status.deselect();
         if(Network.getInstance().getStatus()) {
             status.setText("Connected");
-            status.setStyle("-fx-background-color:#40d660;-fx-text-fill:#000000");
+            status.setStyle("-fx-background-color:#40d660;-fx-text-fill:#000000;-fx-border-color: #1d1d1d;-fx-border-radius:4;");
             reg.setDisable(false);
         } else {
-            new Thread(this::disconnected).start();
+            Thread t = new Thread(this::disconnected);
+            t.setDaemon(true);
+            t.start();
         }
     }
 
     private void changeScreen() {
-        Parent root = null;
         if(saveUser.isSelected()) {
             PropertiesLoader.getInstance().setProperty("username", login.getText());
             try {
@@ -72,9 +73,9 @@ public class AuthController implements Initializable, InputListener {
             }
         }
         try {
-            root = FXMLLoader.load(getClass().getResource("/mainWindow.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/mainWindow.fxml"));
             Stage stage = (Stage) mainVBox.getScene().getWindow();
-            stage.setScene(new Scene(root, 600, 400));
+            stage.setScene(new Scene(root, 900, 400));
             Network.getInstance().removeListener(this);
         } catch (IOException e) {
             e.printStackTrace();
@@ -86,20 +87,22 @@ public class AuthController implements Initializable, InputListener {
         if (Network.getInstance().getStatus()) {
             Network.getInstance().addToQueue(new AuthMessage(login.getText(), password.getText(), registration.isSelected()));
         } else {
-            new Thread(() -> disconnected());
+            Thread t = new Thread(() -> disconnected());
+            t.setDaemon(true);
+            t.start();
         }
     }
 
     public void connected() {
         status.setText("Connected");
-        status.setStyle("-fx-background-color:#40d660;-fx-text-fill:#000000");
+        status.setStyle("-fx-background-color:#40d660;-fx-text-fill:#000000;-fx-border-color: #1d1d1d;-fx-border-radius: 4;");
         reg.setDisable(false);
     }
 
     public void disconnected() {
         Platform.runLater(() -> {
             status.setText("Disconnected");
-            status.setStyle("-fx-background-color:#f20c0f;-fx-text-fill:#ffffff");
+            status.setStyle("-fx-background-color:#f20c0f;-fx-text-fill:#ffffff;-fx-border-color: #1d1d1d;-fx-border-radius:4;");
             reg.setDisable(true);
         });
         try {
@@ -126,7 +129,9 @@ public class AuthController implements Initializable, InputListener {
                         new Alert(Alert.AlertType.ERROR, "Wrong username or password", ButtonType.OK, ButtonType.CANCEL).showAndWait();
                         break;
                     case DISCONNECTED:
-                        new Thread(this::disconnected).start();
+                        Thread t = new Thread(this::disconnected);
+                        t.setDaemon(true);
+                        t.start();
                         break;
                     default:
                             break;
