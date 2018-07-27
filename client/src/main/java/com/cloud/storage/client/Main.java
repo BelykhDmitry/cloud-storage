@@ -6,6 +6,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -18,6 +20,12 @@ public class Main extends Application {
 
     @Override
     public void init() throws Exception {
+        try {
+            PropertiesLoader.getInstance().load(PropertiesLoader.getInstance().PATH);
+            System.err.println(PropertiesLoader.getInstance().getProperty("host") + ":" + PropertiesLoader.getInstance().getProperty("port"));
+        } catch (IOException e){
+            System.err.println("Не удалось загрузить настройки: " + e.getMessage());
+        }
         super.init();
         Network.getInstance().start();
         Network.getInstance().connect();

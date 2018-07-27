@@ -150,8 +150,16 @@ public  class  Network {
 
     public void connect() {
         try {
-            String host = "localhost";
-            int port = 8189;
+            String host;
+            int port;
+            if(PropertiesLoader.getInstance().getStatus()) {
+                host = PropertiesLoader.getInstance().getProperty("host");
+                port = Integer.parseInt(PropertiesLoader.getInstance().getProperty("port"));
+                System.err.println("Loaded from Properties");
+            } else {
+                host = "localhost";
+                port = 8189;
+            }
             try {
                 if (!sock.isClosed())
                     sock.close();
