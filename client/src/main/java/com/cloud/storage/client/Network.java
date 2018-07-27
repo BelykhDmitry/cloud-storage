@@ -166,11 +166,12 @@ public  class  Network {
                     sock.close();
             } catch (NullPointerException e) {}
             sock = new Socket(host, port);
+            //sock.setReceiveBufferSize(sock.getReceiveBufferSize() * 20);
             oeos = new ObjectEncoderOutputStream(sock.getOutputStream());
             odis = new ObjectDecoderInputStream(sock.getInputStream());
             rc = RC.OK;
             counter = 0;
-            System.out.println("Connected");
+            System.out.println("Connected. Receive/Send Buffer size: " + sock.getReceiveBufferSize() + ":"+sock.getSendBufferSize());
         } catch (UnknownHostException e) {
             System.out.println(e.getMessage());
             rc = RC.ERROR;
