@@ -21,6 +21,9 @@ import java.util.ResourceBundle;
 public class AuthController implements Initializable, InputListener {
 
     @FXML
+    CheckBox saveUser;
+
+    @FXML
     VBox mainVBox;
 
     @FXML
@@ -41,6 +44,9 @@ public class AuthController implements Initializable, InputListener {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Network.getInstance().addListener(this);
+        String username = PropertiesLoader.getInstance().getProperty("username");
+        if(username != null)
+            login.setText(username);
         status.setEditable(false);
         status.setAlignment(Pos.CENTER);
         status.setStyle("-fx-background-color:#f20c0f;-fx-text-fill:#ffffff");
@@ -57,6 +63,14 @@ public class AuthController implements Initializable, InputListener {
 
     private void changeScreen() {
         Parent root = null;
+        if(saveUser.isSelected()) {
+            PropertiesLoader.getInstance().setProperty("username", login.getText());
+            try {
+                PropertiesLoader.getInstance().store(PropertiesLoader.getInstance().PATH);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         try {
             root = FXMLLoader.load(getClass().getResource("/mainWindow.fxml"));
             Stage stage = (Stage) mainVBox.getScene().getWindow();

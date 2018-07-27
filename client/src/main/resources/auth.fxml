@@ -22,11 +22,17 @@
             <Insets bottom="10.0" />
         </VBox.margin></TextField>
     <PasswordField fx:id="password" maxWidth="200" promptText="Password" />
-    <CheckBox fx:id="registration" text="Регистрация">
+    <HBox alignment="CENTER">
         <VBox.margin>
             <Insets top="10.0" />
         </VBox.margin>
-    </CheckBox>
+        <CheckBox fx:id="registration" text="Регистрация">
+            <HBox.margin>
+                <Insets right="10.0"/>
+            </HBox.margin>
+        </CheckBox>
+        <CheckBox fx:id="saveUser" text="Save Username"/>
+    </HBox>
     <Button fx:id="reg" onAction="#auth" prefWidth="200" text="Authorization">
         <opaqueInsets>
             <Insets />

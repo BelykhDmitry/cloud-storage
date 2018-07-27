@@ -14,6 +14,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import sun.nio.ch.Net;
 
 import java.io.File;
 import java.io.IOException;
@@ -191,7 +192,11 @@ public class MainWindowController implements Initializable {
         Platform.runLater(this::btnRefresh);
     }
 
-    public void btnRefresh() {this.pathView.setRoot(root); this.pathView.refresh();}
+    public void btnRefresh() {
+        Network.getInstance().addToQueue(new CmdMessage("", CmdMessage.CmdType.GET_PATHS_LIST));
+        this.pathView.setRoot(root);
+        this.pathView.refresh();
+    }
 
     private String getItemPath(TreeItem<FileStats> item) {
         String path = item.getValue().getRelativeNameProperty().get();

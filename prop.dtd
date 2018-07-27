@@ -1,4 +1,5 @@
-#Server parameters
-#Thu Jul 26 10:57:37 MSK 2018
+#Properties
+#Fri Jul 27 12:08:01 MSK 2018
 port=8189
 host=localhost
+username=User1
