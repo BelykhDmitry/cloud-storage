@@ -28,7 +28,7 @@ public class FileManager {
         return localInstance;
     }
 
-    private final String rootFolder = "C:\\Users\\Dmitrii\\Cloud\\";  //TODO: Server Settings from File
+    private final String rootFolder = "D:\\Dmitrii\\Cloud\\";  //TODO: Server Settings from File
 
     //public void setPath(String path) {this.rootFolder = path;}
 
@@ -92,6 +92,7 @@ public class FileManager {
     }
 
     public String getXMLTree(String user, String filePath) {
+        System.err.println(user + " " + filePath);
         Path p = Paths.get(rootFolder + user + "\\" + filePath);
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
@@ -123,6 +124,7 @@ public class FileManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.err.println(strBuilder.toString());
         return strBuilder.toString();
     }
 

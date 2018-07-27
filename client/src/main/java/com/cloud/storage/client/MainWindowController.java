@@ -4,7 +4,10 @@ import com.cloud.storage.common.CmdMessage;
 import com.cloud.storage.common.FileMessage;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
@@ -88,7 +91,7 @@ public class MainWindowController implements Initializable {
         TextInputDialog dialog = new TextInputDialog();
         dialog.showAndWait();
         String folderName = dialog.getResult();
-        if (!folderName.matches("[a-zA-Zа-яА-Я0-9]+")) folderName = "New Folder"; // TODO: Заглушка
+        if (!folderName.matches("[a-zA-Zа-яА-Я0-9 ]+")) folderName = "New Folder"; // TODO: Заглушка
         System.out.println("Add Folder");
         if (pathView.getSelectionModel().isEmpty()) {
         } else if (pathView.getSelectionModel().getSelectedItem().getValue().isDirectory()) {
@@ -158,7 +161,7 @@ public class MainWindowController implements Initializable {
         TextInputDialog dialog = new TextInputDialog();
         dialog.showAndWait();
         String fileName = dialog.getResult();
-        if (fileName == null || !fileName.matches("[a-zA-Zа-яА-Я0-9]+")) {
+        if (fileName == null || !fileName.matches("[a-zA-Zа-яА-Я0-9 ]+")) {
             new Alert(Alert.AlertType.ERROR, "New File Name must contain Chars and Numbers", ButtonType.OK, ButtonType.CANCEL).showAndWait();
             return;
         } else {
@@ -178,7 +181,7 @@ public class MainWindowController implements Initializable {
                 }
             }
             System.out.println(path + " " + path2);
-            //Network.getInstance().addToQueue(new CmdMessage(path+"=>"+path2, CmdMessage.CmdType.RENAME));
+            Network.getInstance().addToQueue(new CmdMessage(path+"=>"+path2, CmdMessage.CmdType.RENAME));
         }
     }
 
@@ -194,5 +197,17 @@ public class MainWindowController implements Initializable {
         if(item.getParent() != null && item.getParent().getParent() != null) {
             return getItemPath(item.getParent()) + "\\" + path;
         } else return path;
+    }
+
+    public void serverDisconnected() {
+        new Alert(Alert.AlertType.ERROR, "Server disconnected :(", ButtonType.OK, ButtonType.CANCEL).showAndWait();
+        try {
+            Network.getInstance().removeListener(msgController);
+            Parent root = FXMLLoader.load(getClass().getResource("/auth.fxml"));
+            Stage stage = (Stage) mainVBox.getScene().getWindow();
+            stage.setScene(new Scene(root, 400, 400));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

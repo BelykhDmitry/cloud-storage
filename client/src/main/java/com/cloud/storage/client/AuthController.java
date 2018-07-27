@@ -4,7 +4,6 @@ import com.cloud.storage.common.AbstractMessage;
 import com.cloud.storage.common.AuthMessage;
 import com.cloud.storage.common.ServerCallbackMessage;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -14,8 +13,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
-import sun.nio.ch.Net;
 
 import java.io.IOException;
 import java.net.URL;
@@ -48,13 +45,13 @@ public class AuthController implements Initializable, InputListener {
         status.setAlignment(Pos.CENTER);
         status.setStyle("-fx-background-color:#f20c0f;-fx-text-fill:#ffffff");
         reg.setDisable(true);
+        status.deselect();
         if(Network.getInstance().getStatus()) {
             status.setText("Connected");
             status.setStyle("-fx-background-color:#40d660;-fx-text-fill:#000000");
             reg.setDisable(false);
         } else {
             new Thread(this::disconnected).start();
-            //Platform.runLater(() -> disconnected());
         }
     }
 
@@ -75,7 +72,7 @@ public class AuthController implements Initializable, InputListener {
         if (Network.getInstance().getStatus()) {
             Network.getInstance().addToQueue(new AuthMessage(login.getText(), password.getText(), registration.isSelected()));
         } else {
-            disconnected();
+            new Thread(() -> disconnected());
         }
     }
 
@@ -86,16 +83,17 @@ public class AuthController implements Initializable, InputListener {
     }
 
     public void disconnected() {
-        status.setText("Disconnected");
-        status.setStyle("-fx-background-color:#f20c0f;-fx-text-fill:#ffffff");
-        reg.setDisable(true);
+        Platform.runLater(() -> {
+            status.setText("Disconnected");
+            status.setStyle("-fx-background-color:#f20c0f;-fx-text-fill:#ffffff");
+            reg.setDisable(true);
+        });
         try {
-            //Network.getInstance().disconnectt();
             while (!Network.getInstance().getStatus()) {
-                new Thread(() -> Network.getInstance().connectt()).start();
-                Thread.sleep(1000);
+                Network.getInstance().connect();
+                Thread.sleep(5000);
             }
-            connected();
+            Platform.runLater(this::connected);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -105,10 +103,19 @@ public class AuthController implements Initializable, InputListener {
     public <T extends AbstractMessage> void onMsgReceived(T msg) {
         if (msg instanceof ServerCallbackMessage) {
             Platform.runLater(() -> {
-                if (((ServerCallbackMessage) msg).getStatus() == ServerCallbackMessage.Answer.OK) {
-                    changeScreen();
-                } else if (((ServerCallbackMessage) msg).getStatus() == ServerCallbackMessage.Answer.FAIL){
-                    new Alert(Alert.AlertType.ERROR, "Wrong username or password", ButtonType.OK, ButtonType.CANCEL).showAndWait();
+                ServerCallbackMessage message = (ServerCallbackMessage) msg;
+                switch (message.getStatus()){
+                    case OK:
+                        changeScreen();
+                        break;
+                    case FAIL:
+                        new Alert(Alert.AlertType.ERROR, "Wrong username or password", ButtonType.OK, ButtonType.CANCEL).showAndWait();
+                        break;
+                    case DISCONNECTED:
+                        new Thread(this::disconnected).start();
+                        break;
+                    default:
+                            break;
                 }
             });
         }

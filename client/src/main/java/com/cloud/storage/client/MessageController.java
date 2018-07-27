@@ -4,6 +4,7 @@ import com.cloud.storage.common.AbstractMessage;
 import com.cloud.storage.common.FileMessage;
 import com.cloud.storage.common.FilesMessage;
 import com.cloud.storage.common.ServerCallbackMessage;
+import javafx.application.Platform;
 import javafx.scene.control.*;
 
 import javax.xml.parsers.*;
@@ -33,7 +34,13 @@ public class MessageController implements InputListener{
     public <T extends AbstractMessage> void onMsgReceived(T msg) {
         if (msg instanceof ServerCallbackMessage) {
             System.out.println("New Callback:");
-            System.out.println(((ServerCallbackMessage)msg).getStatus());
+            switch(((ServerCallbackMessage)msg).getStatus()) {
+                case DISCONNECTED:
+                    Platform.runLater(ctrl::serverDisconnected);
+                    break;
+                default:
+                    System.err.println(((ServerCallbackMessage)msg).getStatus());
+            }
         } else if (msg instanceof FileMessage) {
             System.out.println("New File msg:");
             FileMessage in = (FileMessage)msg;
@@ -47,7 +54,7 @@ public class MessageController implements InputListener{
                 } finally {
                     fileSavePath = null;
                 }
-            } else {}
+            }
         } else if (msg instanceof FilesMessage) {
             System.out.println("New Files List:");
             TreeItem<FileStats> root = processXml(((FilesMessage) msg).getXML());
@@ -58,6 +65,7 @@ public class MessageController implements InputListener{
     }
 
     private TreeItem<FileStats> processXml(String str) {
+        System.out.println(str);
         DocumentBuilderFactory factory =
                 DocumentBuilderFactory.newInstance();
         TreeItem<FileStats> tree = null;
@@ -66,11 +74,7 @@ public class MessageController implements InputListener{
             Document doc = builder.parse(new ByteArrayInputStream(str.getBytes("UTF-8")));
             Node node = doc.getFirstChild();
             tree = getNodes(node);
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
         }
         return tree;

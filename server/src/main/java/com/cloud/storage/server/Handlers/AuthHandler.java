@@ -58,14 +58,12 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
 
     @NotNull
     private void failAnswer(ChannelHandlerContext ctx) {
-        ctx.write(new ServerCallbackMessage(ServerCallbackMessage.Answer.FAIL));
-        ctx.flush();
+        ctx.writeAndFlush(new ServerCallbackMessage(ServerCallbackMessage.Answer.FAIL));
     }
 
     @NotNull
     private void okAnswer(ChannelHandlerContext ctx) {
-        ctx.write(new ServerCallbackMessage(ServerCallbackMessage.Answer.OK));
-        ctx.flush();
+        ctx.writeAndFlush(new ServerCallbackMessage(ServerCallbackMessage.Answer.OK));
     }
 
     private void authOk(ChannelHandlerContext ctx, String name) {

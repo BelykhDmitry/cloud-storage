@@ -1,18 +1,10 @@
 package com.cloud.storage.client;
 
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
-
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Properties;
 
 public class Main extends Application {
     @Override
@@ -28,12 +20,12 @@ public class Main extends Application {
     public void init() throws Exception {
         super.init();
         Network.getInstance().start();
-        Network.getInstance().connectt();
+        Network.getInstance().connect();
     }
 
     @Override
     public void stop() throws Exception {
-        Network.getInstance().disconnectt();
+        Network.getInstance().disconnect();
         Network.getInstance().stop();
         System.out.println("I'm done!");
         super.stop();
