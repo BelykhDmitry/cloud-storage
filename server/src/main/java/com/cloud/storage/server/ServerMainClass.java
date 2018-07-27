@@ -18,7 +18,7 @@ import java.sql.SQLException;
 
 public class ServerMainClass {
     private static final int PORT = 8189;
-    private static final int MAX_OBJ_SIZE = 1024 * 1024 * 100;
+    private static final int MAX_OBJ_SIZE = 1024 * 1024 * 200;
 
     public void run() throws Exception {
         try {

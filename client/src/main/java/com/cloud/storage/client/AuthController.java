@@ -49,12 +49,12 @@ public class AuthController implements Initializable, InputListener {
             login.setText(username);
         status.setEditable(false);
         status.setAlignment(Pos.CENTER);
-        status.setStyle("-fx-background-color:#f20c0f;-fx-text-fill:#ffffff;-fx-border-color: #1d1d1d;-fx-border-radius:4;");
+        status.setStyle("-fx-background-radius:4;-fx-background-color:#f20c0f;-fx-text-fill:#ffffff;-fx-border-color: #1d1d1d;-fx-border-radius:4;");
         reg.setDisable(true);
         status.deselect();
         if(Network.getInstance().getStatus()) {
             status.setText("Connected");
-            status.setStyle("-fx-background-color:#40d660;-fx-text-fill:#000000;-fx-border-color: #1d1d1d;-fx-border-radius:4;");
+            status.setStyle("-fx-background-radius:4;-fx-background-color:#40d660;-fx-text-fill:#000000;-fx-border-color: #1d1d1d;-fx-border-radius:4;");
             reg.setDisable(false);
         } else {
             Thread t = new Thread(this::disconnected);
@@ -95,14 +95,14 @@ public class AuthController implements Initializable, InputListener {
 
     public void connected() {
         status.setText("Connected");
-        status.setStyle("-fx-background-color:#40d660;-fx-text-fill:#000000;-fx-border-color: #1d1d1d;-fx-border-radius: 4;");
+        status.setStyle("-fx-background-radius:4;-fx-background-color:#40d660;-fx-text-fill:#000000;-fx-border-color: #1d1d1d;-fx-border-radius: 4;");
         reg.setDisable(false);
     }
 
     public void disconnected() {
         Platform.runLater(() -> {
             status.setText("Disconnected");
-            status.setStyle("-fx-background-color:#f20c0f;-fx-text-fill:#ffffff;-fx-border-color: #1d1d1d;-fx-border-radius:4;");
+            status.setStyle("-fx-background-radius:4;-fx-background-color:#f20c0f;-fx-text-fill:#ffffff;-fx-border-color: #1d1d1d;-fx-border-radius:4;");
             reg.setDisable(true);
         });
         try {
