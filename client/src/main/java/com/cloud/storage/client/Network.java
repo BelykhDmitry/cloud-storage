@@ -41,7 +41,7 @@ public  class  Network {
                             fireListeners(inQueue.poll());
                         }
                     }catch (IOException | NullPointerException e) {
-                        e.printStackTrace();
+                        System.err.println(e.getMessage());
                         fireListenersRC(RC.ERROR);
                     } catch (ClassNotFoundException e) {
                         System.err.println("Неопознанный тип сообщения");

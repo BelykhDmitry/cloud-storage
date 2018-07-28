@@ -82,6 +82,7 @@ public class MainWindowController implements Initializable {
             }
             try {
                 Network.getInstance().addToQueue(new FileMessage(relativeName, file.isDirectory(), Files.readAllBytes(file.toPath()), file.length()));
+                pathView.getSelectionModel().clearSelection();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -106,6 +107,7 @@ public class MainWindowController implements Initializable {
         }}
         System.out.println(folderName);
         Network.getInstance().addToQueue(new CmdMessage(folderName, CmdMessage.CmdType.CREATE_FOLDER));
+        pathView.getSelectionModel().clearSelection();
     }
 
     public void btnDownloadFile() {
@@ -125,6 +127,7 @@ public class MainWindowController implements Initializable {
             }
             msgController.setFileSavePath(file.getAbsolutePath());
             Network.getInstance().addToQueue(new CmdMessage(relativeName, CmdMessage.CmdType.GET_FILE));
+            pathView.getSelectionModel().clearSelection();
         }
     }
 
@@ -140,6 +143,7 @@ public class MainWindowController implements Initializable {
             } else {
                 Network.getInstance().addToQueue(new CmdMessage(path, CmdMessage.CmdType.REMOVE_FILE));
             }
+            pathView.getSelectionModel().clearSelection();
         } else if (result.get().getText().equals("Cancel")) {
             System.out.println("You clicked Cancel");
         }
@@ -185,6 +189,7 @@ public class MainWindowController implements Initializable {
             }
             System.out.println(path + " " + path2);
             Network.getInstance().addToQueue(new CmdMessage(path+"=>"+path2, CmdMessage.CmdType.RENAME));
+            pathView.getSelectionModel().clearSelection();
         }
     }
 
