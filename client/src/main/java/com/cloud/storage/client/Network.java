@@ -41,7 +41,7 @@ public  class  Network {
                             fireListeners(inQueue.poll());
                         }
                     }catch (IOException | NullPointerException e) {
-                        System.err.println(e.getMessage());
+                        e.printStackTrace();
                         fireListenersRC(RC.ERROR);
                     } catch (ClassNotFoundException e) {
                         System.err.println("Неопознанный тип сообщения");
@@ -69,11 +69,9 @@ public  class  Network {
                     if(Thread.interrupted()) break;
                     try {
                         System.out.println("Tick Out");
-                        if (outQueue.size() > 0) {
-                            oeos.writeObject(outQueue.poll());
-                            oeos.flush();
-                        }
-                        Thread.sleep(1000);
+                        AbstractMessage msg = (AbstractMessage)outQueue.take();
+                        oeos.writeObject(msg);
+                        oeos.flush();
                     } catch (IOException e) {
                         System.err.println(e.getMessage());
                         fireListenersRC(RC.ERROR);
@@ -88,9 +86,8 @@ public  class  Network {
         }
     }
 
-    private volatile int counter = 0;
     private Socket sock = null;
-    private Queue<Serializable> outQueue;
+    private ArrayBlockingQueue<Serializable> outQueue;
     private Queue<AbstractMessage> inQueue;
     private ObjectEncoderOutputStream oeos = null;
     private ObjectDecoderInputStream odis = null;
@@ -100,7 +97,7 @@ public  class  Network {
     private Semaphore smp = new Semaphore(1);
 
     private Network() {
-        outQueue = new ConcurrentLinkedQueue<>();
+        outQueue = new ArrayBlockingQueue<>(10);
         inQueue = new ConcurrentLinkedQueue<>();
         listeners = new ArrayList<>();
     }
@@ -113,7 +110,11 @@ public  class  Network {
     }
 
     public <T extends AbstractMessage> void addToQueue  (T msg) {
-        this.outQueue.add(msg);
+        try {
+            this.outQueue.put(msg);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         System.err.println("New Output message");
     }
 
@@ -162,15 +163,14 @@ public  class  Network {
                 port = 8189;
             }
             try {
-                if (!sock.isClosed())
+                if (!sock.isClosed()) {
                     sock.close();
+                }
             } catch (NullPointerException e) {}
             sock = new Socket(host, port);
-            //sock.setReceiveBufferSize(sock.getReceiveBufferSize() * 20);
             oeos = new ObjectEncoderOutputStream(sock.getOutputStream());
-            odis = new ObjectDecoderInputStream(sock.getInputStream());
+            odis = new ObjectDecoderInputStream(sock.getInputStream(), 100*1024*1024);
             rc = RC.OK;
-            counter = 0;
             System.out.println("Connected. Receive/Send Buffer size: " + sock.getReceiveBufferSize() + ":"+sock.getSendBufferSize());
         } catch (UnknownHostException e) {
             System.out.println(e.getMessage());
