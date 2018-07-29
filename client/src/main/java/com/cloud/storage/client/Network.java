@@ -54,7 +54,7 @@ public  class  Network {
                 System.err.println(e.getMessage());
                 fireListenersRC(RC.ERROR);
             } finally {
-                System.out.println("Del Input thread");
+                System.err.println("Exit Input thread");
             }
         }
     }
@@ -78,10 +78,10 @@ public  class  Network {
                     }
                 }
             } catch (InterruptedException | NullPointerException e) {
-                e.printStackTrace();
+                System.err.println(e.getMessage());
                 fireListenersRC(RC.ERROR);
             } finally {
-                System.out.println("Del Output thread");
+                System.err.println("Exit Output thread");
             }
         }
     }
@@ -216,6 +216,7 @@ public  class  Network {
 
     private void fireListenersRC(RC code) {
         if(rc != code) {
+            System.err.println("ERROR msg!");
             rc = code;
             switch(rc){
                 case OK:

@@ -97,7 +97,7 @@ public class AuthController implements Initializable, InputListener {
         try {
             while (!Network.getInstance().getStatus()) {
                 Network.getInstance().connect();
-                Thread.sleep(5000);
+                Thread.sleep(5000); //  TODO: По количеству/времени подключения
             }
             Platform.runLater(this::connected);
         } catch (InterruptedException e) {
