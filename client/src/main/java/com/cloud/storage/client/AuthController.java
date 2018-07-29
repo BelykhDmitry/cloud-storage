@@ -48,14 +48,9 @@ public class AuthController implements Initializable, InputListener {
         if(username != null)
             login.setText(username);
         status.setEditable(false);
-        status.setAlignment(Pos.CENTER);
-        status.setStyle("-fx-background-radius:4;-fx-background-color:#f20c0f;-fx-text-fill:#ffffff;-fx-border-color: #1d1d1d;-fx-border-radius:4;");
-        reg.setDisable(true);
-        status.deselect();
+        setUIDisconnected();
         if(Network.getInstance().getStatus()) {
-            status.setText("Connected");
-            status.setStyle("-fx-background-radius:4;-fx-background-color:#40d660;-fx-text-fill:#000000;-fx-border-color: #1d1d1d;-fx-border-radius:4;");
-            reg.setDisable(false);
+            setUIConnected();
         } else {
             Thread t = new Thread(this::disconnected);
             t.setDaemon(true);
@@ -93,18 +88,12 @@ public class AuthController implements Initializable, InputListener {
         }
     }
 
-    public void connected() {
-        status.setText("Connected");
-        status.setStyle("-fx-background-radius:4;-fx-background-color:#40d660;-fx-text-fill:#000000;-fx-border-color: #1d1d1d;-fx-border-radius: 4;");
-        reg.setDisable(false);
+    private void connected() {
+        setUIConnected();
     }
 
-    public void disconnected() {
-        Platform.runLater(() -> {
-            status.setText("Disconnected");
-            status.setStyle("-fx-background-radius:4;-fx-background-color:#f20c0f;-fx-text-fill:#ffffff;-fx-border-color: #1d1d1d;-fx-border-radius:4;");
-            reg.setDisable(true);
-        });
+    private void disconnected() {
+        Platform.runLater(this::setUIDisconnected);
         try {
             while (!Network.getInstance().getStatus()) {
                 Network.getInstance().connect();
@@ -116,8 +105,20 @@ public class AuthController implements Initializable, InputListener {
         }
     }
 
+    private void setUIDisconnected() {
+        status.setText("Disconnected");
+        status.setStyle("-fx-background-radius:4;-fx-background-color:#f20c0f;-fx-text-fill:#ffffff;-fx-border-color: #1d1d1d;-fx-border-radius:4;");
+        reg.setDisable(true);
+    }
+
+    private void setUIConnected() {
+        status.setText("Connected");
+        status.setStyle("-fx-background-radius:4;-fx-background-color:#40d660;-fx-text-fill:#000000;-fx-border-color: #1d1d1d;-fx-border-radius: 4;");
+        reg.setDisable(false);
+    }
+
     @Override
-    public <T extends AbstractMessage> void onMsgReceived(T msg) {
+    public void onMsgReceived(AbstractMessage msg) {
         if (msg instanceof ServerCallbackMessage) {
             Platform.runLater(() -> {
                 ServerCallbackMessage message = (ServerCallbackMessage) msg;

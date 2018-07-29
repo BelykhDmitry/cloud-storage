@@ -15,7 +15,7 @@
       styleClass="background"
       fx:controller="com.cloud.storage.client.AuthController"
       prefHeight="400.0" prefWidth="600.0">
-    <TextField fx:id="status" maxWidth="150" style="-fx-background-color:#f20c0f;-fx-text-fill:#ffffff">
+    <TextField fx:id="status" maxWidth="150" style="-fx-background-color:#f20c0f;-fx-text-fill:#ffffff" alignment="CENTER" focusTraversable="false">
         <VBox.margin>
             <Insets bottom="50.0" />
         </VBox.margin></TextField>

@@ -31,7 +31,7 @@ public class MessageController implements InputListener{
     }
 
     @Override
-    public <T extends AbstractMessage> void onMsgReceived(T msg) {
+    public void onMsgReceived(AbstractMessage msg) {
         if (msg instanceof ServerCallbackMessage) {
             System.out.println("New Callback:");
             switch(((ServerCallbackMessage)msg).getStatus()) {

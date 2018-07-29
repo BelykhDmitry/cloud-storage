@@ -130,11 +130,11 @@ public  class  Network {
     }
 
     public void removeAll() {
-        listeners.removeAll(listeners); //FIXME
+        listeners.clear();
         System.out.println(listeners.size());
     }
 
-    private <T extends AbstractMessage> void fireListeners(T msg) {
+    private void fireListeners(AbstractMessage msg) {
         try {
             smp.acquire();
             for(InputListener listener : listeners) {

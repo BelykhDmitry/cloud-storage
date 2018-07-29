@@ -216,7 +216,7 @@ public class MainWindowController implements Initializable {
     }
 
     public void serverDisconnected() {
-        new Alert(Alert.AlertType.ERROR, "Server disconnected :(", ButtonType.OK, ButtonType.CANCEL).showAndWait();
+        new Alert(Alert.AlertType.ERROR, "Server disconnected :(", ButtonType.OK).showAndWait();
         changeScreen();
     }
 
