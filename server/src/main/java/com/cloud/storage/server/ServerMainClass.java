@@ -15,10 +15,14 @@ import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ServerMainClass {
     private static final int PORT = 8189;
     private static final int MAX_OBJ_SIZE = 1024 * 1024 * 200;
+
+    private static Logger log = Logger.getLogger(ServerMainClass.class.getName());
 
     public void run() throws Exception {
         try {
@@ -47,10 +51,8 @@ public class ServerMainClass {
                 mainGroup.shutdownGracefully();
                 workerGroup.shutdownGracefully();
             }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (ClassNotFoundException | SQLException e) {
+            log.log(Level.SEVERE, "Exception: ", e);
         } finally {
             Authorization.getInstance().disconnect();
         }

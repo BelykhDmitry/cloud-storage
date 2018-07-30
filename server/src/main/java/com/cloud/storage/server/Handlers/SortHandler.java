@@ -12,40 +12,40 @@ import io.netty.util.ReferenceCountUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SortHandler extends ChannelInboundHandlerAdapter {
+
+    private static Logger log = Logger.getLogger(SortHandler.class.getName());
 
     private String userName;
     //private boolean blocked = false;
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        System.out.println("SortHandler In Read");
-        System.out.flush();
         try {
             if (msg == null)
                 return;
-            System.out.println(msg.getClass()); //TODO: Logging
-            System.out.flush();
+            log.info("New message from " + userName + ": " + msg.getClass().getName());
             if (msg instanceof CmdMessage) {
                 CmdManager.getInstance().processCmd(userName, (CmdMessage) msg, ctx);
-                System.out.println(((CmdMessage) msg).getCmd() + " " + ((CmdMessage) msg).getCmdType());
-                System.out.flush();
+                log.info(userName + ": " + ((CmdMessage) msg).getCmd() + " " + ((CmdMessage) msg).getCmdType());
             } else if (msg instanceof FileMessage) {
-                System.out.println(((FileMessage)msg).getFileRelativePathName() + ": " + ((FileMessage)msg).getData().length);
-                System.out.flush();
+                log.info(userName + ": " + ((FileMessage)msg).getFileRelativePathName() + ": " + ((FileMessage)msg).getData().length);
                 try {
                     FileManager.getInstance().writeFile(userName, (FileMessage) msg);
                     ctx.write(new ServerCallbackMessage(ServerCallbackMessage.Answer.OK));
                     ctx.flush();
                     CmdManager.getInstance().processCmd(userName, new CmdMessage("", CmdMessage.CmdType.GET_PATHS_LIST), ctx);
                 } catch (IOException e) {
+                    log.log(Level.SEVERE, "Exception: ", e);
                     ctx.write(new ServerCallbackMessage(ServerCallbackMessage.Answer.FAIL));
                 }
             } else if (msg instanceof Ping) {
                 ctx.writeAndFlush(new Ping());
             } else {
-                System.out.println("Неопознанный тип сообщения");
+                log.info("Неопознанный тип сообщения");
             }
         } finally {
             ReferenceCountUtil.release(msg);
@@ -58,7 +58,7 @@ public class SortHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        cause.printStackTrace();
+        log.log(Level.SEVERE, "Exception: ", cause);
         ctx.close();
     }
 

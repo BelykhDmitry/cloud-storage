@@ -10,10 +10,13 @@ import java.net.URI;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 public class FileManager {
 
     private static volatile FileManager instance;
+
+    private static Logger log = Logger.getLogger(FileManager.class.getName());
 
     public static FileManager getInstance() {
         FileManager localInstance = instance;
@@ -28,28 +31,30 @@ public class FileManager {
         return localInstance;
     }
 
-    private final String rootFolder = "D:\\Dmitrii\\Cloud\\";  //TODO: Server Settings from File
+    private final String rootFolder = "C:\\Users\\Dmitrii\\Cloud\\";  //TODO: Server Settings from File
 
     //public void setPath(String path) {this.rootFolder = path;}
 
     public void writeFile(String user, FileMessage msg) throws IOException {
         String path = rootFolder + user + "\\" + msg.getFileRelativePathName();
-        System.out.println("Received from " + user + ": " + msg.getFileRelativePathName() + " " + msg.getChecksum() + ":" + msg.checkSum());
-        //Files.createDirectories(Paths.get(path).getRoot());
+        log.info("Received from " + user + ": " + msg.getFileRelativePathName() + " " + msg.getChecksum() + ":" + msg.checkSum());
         Files.write(Paths.get(path), msg.getData());
     }
     public FileMessage readFile(String user, String fileRelativePath) throws IOException {
         Path p = Paths.get(rootFolder + user+ "\\" + fileRelativePath);
+        log.info(user + " read file " + fileRelativePath);
         return new FileMessage(p.getFileName().toString(), false, Files.readAllBytes(p), Files.size(p));
     }
 
     public void makeDir(String user, String path) throws IOException {
         Files.createDirectories(Paths.get(rootFolder + user + "\\" + path));
+        log.info(user + " create folder " + path);
     }
 
     public void removeDir(String user, String dirPath) throws IOException {
         if (dirPath.equals("") || dirPath.contains(".."))
             throw new IOException("Попытка удалить корневой каталог пользователя " + user);
+        log.info(user + " delete folder " + dirPath);
         Path path = Paths.get(rootFolder + user + "\\" + dirPath);
         Files.walkFileTree(path, new FileVisitor<Path>() {
             @Override
@@ -79,11 +84,13 @@ public class FileManager {
     public void removeFile(String user, String filePath) throws IOException {
         if (filePath.equals("") || filePath.contains(".."))
             throw new IOException("Попытка удалить корневой каталог пользователя " + user);
+        log.info(user + " delete " + filePath);
         Files.delete(Paths.get(rootFolder + user + "\\" + filePath));
     }
 
     public void rename(String user, String cmd) throws IOException {
         String[] names = cmd.split("=>", 2);
+        log.info(user + " rename " + cmd);
         if (names.length != 2)
             throw new IOException("Неверная команда");
         if(!new File(rootFolder + user + "\\" + names[0]).renameTo(new File(rootFolder + user + "\\" + names[1]))) {
@@ -100,13 +107,13 @@ public class FileManager {
             Files.walkFileTree(p, new FileVisitor<Path>() {
                 @Override
                 public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                    strBuilder.append("<Dir name=\""  + dir.getFileName().toString() + "\">");
+                    strBuilder.append("<Dir name=\"").append(dir.getFileName().toString()).append("\">");
                     return FileVisitResult.CONTINUE;
                 }
 
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    strBuilder.append("<File name=\"" + file.getFileName().toString()+ "\" size=\""+ file.toFile().length() + "\">"+"</File>");
+                    strBuilder.append("<File name=\"").append(file.getFileName().toString()).append("\" size=\"").append(file.toFile().length()).append("\">").append("</File>");
                     return FileVisitResult.CONTINUE;
                 }
 

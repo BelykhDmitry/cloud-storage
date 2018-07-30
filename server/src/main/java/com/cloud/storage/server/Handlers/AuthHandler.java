@@ -10,7 +10,14 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class AuthHandler extends ChannelInboundHandlerAdapter {
+
+    private static Logger log = Logger.getLogger(AuthHandler.class.getName());
+
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
@@ -21,7 +28,7 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
         try {
             if(msg == null)
                 return;
-            System.out.println(msg.getClass()); //TODO: Logging
+            log.info("New msg: " + msg.getClass().getName());
             if(msg instanceof AuthMessage) {
                 AuthMessage auth = (AuthMessage) msg;
                 if (auth.isRegistration()) {
@@ -42,7 +49,7 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
             } else if (msg instanceof Ping) {
                 ctx.writeAndFlush(new Ping());
             } else {
-                System.out.println("Wrong auth object, return: " + System.currentTimeMillis());
+                log.info("Wrong auth object, return: " + System.currentTimeMillis());
                 return;
             }
         } finally {
@@ -52,17 +59,19 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        cause.printStackTrace();
+        log.log(Level.SEVERE, "Exception: " + cause);
         ctx.close();
     }
 
     @NotNull
     private void failAnswer(ChannelHandlerContext ctx) {
+        log.info("Fail Answer to " + ctx.channel().remoteAddress());
         ctx.writeAndFlush(new ServerCallbackMessage(ServerCallbackMessage.Answer.FAIL));
     }
 
     @NotNull
     private void okAnswer(ChannelHandlerContext ctx) {
+        log.info("Ok Answer to " + ctx.channel().remoteAddress());
         ctx.writeAndFlush(new ServerCallbackMessage(ServerCallbackMessage.Answer.OK));
     }
 
