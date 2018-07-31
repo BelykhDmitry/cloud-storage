@@ -1,6 +1,7 @@
 package com.cloud.storage.server;
 
 import com.cloud.storage.server.Functions.Authorization;
+import com.cloud.storage.server.Functions.Service;
 import com.cloud.storage.server.Handlers.AuthHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -59,6 +60,10 @@ public class ServerMainClass {
     }
 
     public static void main(String[] args) throws Exception {
-        new ServerMainClass().run();  // TODO: Сервисный режим. Перенос хранилища, работа с базой данных (установка пароля и тп).
+        if(args.length == 0)
+            new ServerMainClass().run();  // TODO: Сервисный режим. Перенос хранилища, работа с базой данных (установка пароля и тп).
+        else {
+            Service.runService(args);
+        }
     }
 }
