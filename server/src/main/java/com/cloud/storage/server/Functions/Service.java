@@ -11,20 +11,20 @@ public class Service {
         SOMETHING
     }
 
-    private static Logger log = Logger.getLogger(Service.class.getName());
+    //private static Logger log = Logger.getLogger(Service.class.getName());
     public static void runService (String[] args) {
-        log.info("In service");
+        //log.info("In service");
         int login = "admin".hashCode();
         int pass = "12345".hashCode();
         try {
             if (args[0].hashCode() == login && pass == args[1].hashCode()) {
-                log.info("Login success");
+                //log.info("Login success");
                 process();
             } else {
-                log.info("Login error! Abort");
+                //log.info("Login error! Abort");
             }
         } catch (NullPointerException e) {
-            log.log(Level.SEVERE, "Exception: ", e);
+            //log.log(Level.SEVERE, "Exception: ", e);
         }
     }
 
@@ -36,10 +36,10 @@ public class Service {
             while(type != CmdType.ABORT) {
                 command = reader.readLine();
                 type = getCmdType(command);
-                log.info("New command: " + type);
+                //log.info("New command: " + type);
             }
         } catch (IOException | NullPointerException e) {
-            log.log(Level.SEVERE,"Exception: ", e);
+            //log.log(Level.SEVERE,"Exception: ", e);
         }
     }
 

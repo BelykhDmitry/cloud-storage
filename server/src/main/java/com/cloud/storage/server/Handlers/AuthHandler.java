@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 public class AuthHandler extends ChannelInboundHandlerAdapter {
 
-    private static Logger log = Logger.getLogger(AuthHandler.class.getName());
+    //private static Logger log = Logger.getLogger(AuthHandler.class.getName());
 
 
     @Override
@@ -28,7 +28,7 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
         try {
             if(msg == null)
                 return;
-            log.info("New msg: " + msg.getClass().getName());
+            //log.info("New msg: " + msg.getClass().getName());
             if(msg instanceof AuthMessage) {
                 AuthMessage auth = (AuthMessage) msg;
                 if (auth.isRegistration()) {
@@ -49,7 +49,7 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
             } else if (msg instanceof Ping) {
                 ctx.writeAndFlush(new Ping());
             } else {
-                log.info("Wrong auth object, return: " + System.currentTimeMillis());
+                //log.info("Wrong auth object, return: " + System.currentTimeMillis());
                 return;
             }
         } finally {
@@ -59,19 +59,19 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        log.log(Level.SEVERE, "Exception: " + cause);
+        //log.log(Level.SEVERE, "Exception: " + cause);
         ctx.close();
     }
 
     @NotNull
     private void failAnswer(ChannelHandlerContext ctx) {
-        log.info("Fail Answer to " + ctx.channel().remoteAddress());
+        //log.info("Fail Answer to " + ctx.channel().remoteAddress());
         ctx.writeAndFlush(new ServerCallbackMessage(ServerCallbackMessage.Answer.FAIL));
     }
 
     @NotNull
     private void okAnswer(ChannelHandlerContext ctx) {
-        log.info("Ok Answer to " + ctx.channel().remoteAddress());
+        //log.info("Ok Answer to " + ctx.channel().remoteAddress());
         ctx.writeAndFlush(new ServerCallbackMessage(ServerCallbackMessage.Answer.OK));
     }
 
